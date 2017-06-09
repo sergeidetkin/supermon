@@ -1,0 +1,174 @@
+* {
+    font-size: 14pt;
+    font-family: 'Helvetica';
+    color: rgb(80,80,80);
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    margin: 0px;
+    display: flex;
+    overflow: hidden;
+}
+
+.flex-container {
+    display: flex;
+    flex: 1;
+}
+
+.flex-container div {
+    overflow: auto;
+    flex: 1;
+}
+
+#workspace {
+}
+
+#left {
+    flex: 0 0 30ch;
+    /*background-color: rgb(209,217,223);*/
+    border-right: 2px solid rgb(160,160,160);
+}
+
+div.section-header {
+    flex: 0 0 auto;
+    padding: 4px;
+    color: rgba(0,0,0,0.45);
+    background-color: rgba(0,0,0,0.05);
+    text-transform: uppercase;
+    font-size: smaller;
+}
+
+div#input {
+    flex: 0 0 auto;
+    border-bottom: 2px solid rgb(160,160,160);
+    min-height: 80px;
+}
+
+div#apps {
+    flex: 2;
+    border-bottom: 2px solid rgb(160,160,160);
+}
+
+div#commands {
+    flex: 4;
+}
+
+div p {
+    margin: 2px;
+}
+
+#status-bar {
+    flex: 0 0 auto;
+    /*background-color: rgb(230,230,230);*/
+    border-bottom: 2px solid rgb(160,160,160);
+}
+
+#status-bar > .item {
+    flex: 0 0 auto;
+    line-height: 1.5em;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-right: 2px solid rgb(160,160,160);
+}
+
+
+.list-view {
+    color: inherit
+}
+
+.lv-item {
+    /*background-color: rgb(200,200,200);*/
+    padding: 4px;
+    overflow: hidden;
+}
+
+.lv-item:nth-child(even) {
+    background-color: #EEE;
+}
+
+.lvi-label {
+    color: inherit;
+}
+
+.lvi-caption {
+    color: inherit;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+}
+
+.lvi-info {
+    color: inherit;
+    font-size: smaller;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.lvi-led {
+    position: relative;
+    top: -1px;
+    color: white;
+    font-size: small;
+    text-transform: uppercase;
+    border-radius: 3px;
+    vertical-align: middle;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 1px;
+    margin-right: 4px;
+}
+
+.lv-item > .lvi-label > .lvi-led {
+    background-color: crimson;
+}
+
+.lv-item > .lvi-label > .lvi-led::after {
+    content: "offline";
+}
+
+.online > .lvi-label > .lvi-led {
+    background-color: #00cc00;
+}
+
+.online > .lvi-label > .lvi-led::after {
+    content: "online";
+}
+
+.selected {
+    color: white;
+    background-color: rgb(104, 137, 198);
+}
+
+.selected:nth-child(even) {
+    background-color: rgb(104, 137, 198);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
