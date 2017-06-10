@@ -1,4 +1,4 @@
-// $Id: views.js 464 2017-06-09 05:09:20Z superuser $
+// $Id: views.js 469 2017-06-10 11:56:24Z superuser $
 
 class View
 {
@@ -44,10 +44,11 @@ class CommandListViewItem extends ListViewItem
         return new CommandListViewItem(element);
     }
 
-    bind(command, clientId) {
+    bind(command, target) {
         this.element.textContent = command.name;
         this.element.title = command.description;
-        this.element.targetId = clientId;
+        this.element.command = command;
+        this.element.target = target;
     }
 
 }
@@ -92,6 +93,19 @@ class ProcessListViewItem extends ListViewItem
 
     get online() {
         return this.element.classList.contains('online');
+    }
+
+    set warning(flag) {
+        if (flag && !this.element.classList.contains('warning')) {
+            this.element.classList.add('warning');
+        }
+        else if (this.element.classList.contains('warning')) {
+            this.element.classList.remove('warning');
+        }
+    }
+
+    get warning() {
+        return this.element.classList.contains('warning');
     }
 
     set name(text) {

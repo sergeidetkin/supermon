@@ -1,4 +1,4 @@
-// $Id: application.js 468 2017-06-10 03:37:15Z superuser $
+// $Id: application.js 469 2017-06-10 11:56:24Z superuser $
 
 class Application
 {
@@ -38,7 +38,7 @@ class Application
         var form = document.createElement('div');
 
         var div = document.createElement('div');
-        div.textContent = command.description;
+        div.textContent = command.description || command.name;
         form.appendChild(div);
 
         var table = document.createElement('table');
@@ -114,7 +114,7 @@ class Application
         var id = -1;
         if (-1 != e.selectedIndex) {
             id = this.processListView.element.children[e.selectedIndex].id;
-            status.textContent = id;
+            status.textContent = this.clients[id].name;
             status.parentElement.style.display = '';
         }
         else {
@@ -155,12 +155,36 @@ class Application
         it.online = online;
 
         if (online) {
-            it.info = (new Date(client.when)).toLocaleTimeString() + ': logged in';
+            it.info = (new Date(client.when)).toLocaleTimeString('en-GB') + ': logged in';
         }
         else {
-            it.info = (new Date(client.when)).toLocaleTimeString() + ': (' + client.error.code + ') ' + client.error.reason;
+            it.info = (new Date(client.when)).toLocaleTimeString('en-GB') + ': (' + client.error.code + ') ' + client.error.reason;
         }
 
+    }
+
+    updateStatusBar() {
+        var bg = this.online ? '#00cc00' : 'crimson';
+        //var fg = this.online ? 'rgb(80,80,80)' : 'white';
+        var fg = 'white';
+        var status = document.querySelector('#status-bar > .item > #status');
+        status.textContent = this.online ? document.location.host : 'connecting...';
+        status.style.color = fg;
+        status.parentElement.style.backgroundColor = bg;
+        document.querySelector('#status-bar > .item > #connected').textContent = this.connectedClientsCount;
+    }
+
+    get connectedClientsCount() {
+        var total = 0;
+        var connected = 0;
+
+        for (var id in this.clients) {
+            ++total;
+            if ('connected' == this.clients[id].state) {
+                ++connected;
+            }
+        }
+        return connected;
     }
 
     connect() {
@@ -190,8 +214,10 @@ class Application
             this.reset(true);
         }.bind(this);
 
-        this.ws.onclose = function() {
-            console.log('disconnected');
+        var reconnect = function(e) {
+            if (e) {
+                console.log(e);
+            }
 
             this.reset(false);
 
@@ -202,14 +228,13 @@ class Application
             }
             else {
                 console.error('failed to reconnect');
-                document.querySelector('#status-bar > .item > #status').textContent = 'POWERED OFF';
+                document.querySelector('#status-bar > .item > #status').textContent = 'offline';
             }
-
+            
         }.bind(this);
 
-        this.ws.onerror = function(e) {
-            console.error(e);
-        }.bind(this);
+        this.ws.onclose = reconnect;
+        this.ws.onerror = reconnect;
     }
 
     reset(online) {
@@ -217,17 +242,6 @@ class Application
         this.clients = {};
         this.processListView.clear();
         this.updateStatusBar();
-    }
-
-    updateStatusBar() {
-        var bg = this.online ? '#00cc00' : 'crimson';
-        //var fg = this.online ? 'rgb(80,80,80)' : 'white';
-        var fg = 'white';
-        var status = document.querySelector('#status-bar > .item > #status');
-        status.textContent = this.online ? 'online' : 'offline';
-        status.style.color = fg;
-        status.parentElement.style.backgroundColor = bg;
-        document.querySelector('#status-bar > .item > #connected').textContent = this.connectedClientsCount;
     }
 
     onclients(message) {
@@ -238,19 +252,6 @@ class Application
         }
 
         this.updateStatusBar();
-    }
-
-    get connectedClientsCount() {
-        var total = 0;
-        var connected = 0;
-
-        for (var id in this.clients) {
-            ++total;
-            if ('connected' == this.clients[id].state) {
-                ++connected;
-            }
-        }
-        return connected;
     }
 
     onlogin(message) {
