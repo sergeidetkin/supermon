@@ -1,4 +1,4 @@
-// $Id: application.js 465 2017-06-09 05:42:30Z superuser $
+// $Id: application.js 468 2017-06-10 03:37:15Z superuser $
 
 class Application
 {
@@ -9,6 +9,7 @@ class Application
         this.processListView.addEventListener('change', this.onSelectedClientChanged.bind(this));
 
         this.commandsListView = new ListView(document.querySelector('#commands > .list-view'));
+        this.commandsListView.addEventListener('change', this.onSelectedCommandChanged.bind(this));
 
         this.reconnectTimeout = 3000; // ms
         this.reconnectAttemptsMax = Math.floor(60*1000 / this.reconnectTimeout);
@@ -27,16 +28,98 @@ class Application
             for (var key in client.commands) {
                 var command = client.commands[key];
                 var it = CommandListViewItem.create();
-                it.bind(command, id);
+                it.bind(command, client);
                 this.commandsListView.add(it);
             }
         }
     }
 
+    createInputForm(command) {
+        var form = document.createElement('div');
+
+        var div = document.createElement('div');
+        div.textContent = command.description;
+        form.appendChild(div);
+
+        var table = document.createElement('table');
+
+        for (var key in command.options) {
+            var option = command.options[key];
+            var row = table.insertRow();
+            var cell = row.insertCell();
+            cell.textContent = option.name;
+            cell = row.insertCell();
+            if (undefined == option.values || 0 == option.values.length) {
+                var input = document.createElement('input');
+                cell.appendChild(input);
+            }
+            else {
+                var select = document.createElement('select');
+                for (var n = 0; n < option.values.length; ++n) {
+                    var v = option.values[n];
+                    var o = document.createElement('option');
+                    o.text = v.name;
+                    o.value = v.value;
+                    select.add(o);
+                }
+                cell.appendChild(select);
+            }
+        }
+
+        form.appendChild(table);
+
+        div = document.createElement('div');
+        var button = document.createElement('input');
+        button.type = 'button';
+        button.value = 'Execute';
+        div.appendChild(button);
+
+        form.appendChild(div);
+
+        return form;
+    }
+
+    updateOptionsView(command, target) {
+        var element = document.querySelector('#input');
+        if (element.firstElementChild) {
+            element.removeChild(element.firstElementChild);
+        }
+        if (null == command || null == target) {
+            return;
+        }
+        console.log('->', target.name, command.name);
+        var form = this.createInputForm(command);
+        element.appendChild(form);
+    }
+
+    onSelectedCommandChanged(e) {
+        var status = document.querySelector('#status-bar > .item > #command');
+        var command = null;
+        var target = null;
+        if (-1 != e.selectedIndex) {
+            command = this.commandsListView.element.children[e.selectedIndex].command;
+            target = this.commandsListView.element.children[e.selectedIndex].target;
+            status.textContent = command.name;
+            status.parentElement.style.display = '';
+        }
+        else {
+            status.textContent = '';
+            status.parentElement.style.display = 'none';
+        }
+        this.updateOptionsView(command, target);
+    }
+
     onSelectedClientChanged(e) {
+        var status = document.querySelector('#status-bar > .item > #client');
         var id = -1;
         if (-1 != e.selectedIndex) {
             id = this.processListView.element.children[e.selectedIndex].id;
+            status.textContent = id;
+            status.parentElement.style.display = '';
+        }
+        else {
+            status.textContent = '';
+            status.parentElement.style.display = 'none';
         }
         this.updateCommandsView(id);
     }

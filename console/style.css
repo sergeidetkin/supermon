@@ -28,7 +28,7 @@ body {
 #left {
     flex: 0 0 30ch;
     /*background-color: rgb(209,217,223);*/
-    border-right: 2px solid rgb(160,160,160);
+    border-right: 1px solid rgb(160,160,160);
 }
 
 div.section-header {
@@ -40,15 +40,54 @@ div.section-header {
     font-size: smaller;
 }
 
-div#input {
+#output {
+    padding: 8px;
+}
+
+#input {
     flex: 0 0 auto;
-    border-bottom: 2px solid rgb(160,160,160);
+    border-bottom: 1px solid rgb(160,160,160);
     min-height: 80px;
+    padding: 16px;
+}
+
+#input table {
+    margin-top: 18px;
+    margin-bottom: 18px;
+}
+
+#input table > tbody > tr > td {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 4px;
+}
+
+#input table > tbody > tr > td:first-child {
+    padding-right: 8px;
+    text-align: right;
+}
+
+#input table > tbody > tr > td:first-child::after {
+    content: ": ";
+}
+
+#input input {
+    margin: 0px;
+    min-width: 30ch;
+}
+
+#input input[type=button] {
+    margin: 0px;
+    min-width: 12ch;
+}
+
+#input select {
+    min-width: 100%;
 }
 
 div#apps {
     flex: 2;
-    border-bottom: 2px solid rgb(160,160,160);
+    border-bottom: 1px solid rgb(160,160,160);
 }
 
 div#commands {
@@ -62,7 +101,7 @@ div p {
 #status-bar {
     flex: 0 0 auto;
     /*background-color: rgb(230,230,230);*/
-    border-bottom: 2px solid rgb(160,160,160);
+    border-bottom: 1px solid rgb(160,160,160);
 }
 
 #status-bar > .item {
@@ -70,9 +109,8 @@ div p {
     line-height: 1.5em;
     padding-left: 8px;
     padding-right: 8px;
-    border-right: 2px solid rgb(160,160,160);
+    border-right: 1px solid rgb(160,160,160);
 }
-
 
 .list-view {
     color: inherit
@@ -82,6 +120,7 @@ div p {
     /*background-color: rgb(200,200,200);*/
     padding: 4px;
     overflow: hidden;
+    cursor: default;
 }
 
 .lv-item:nth-child(even) {

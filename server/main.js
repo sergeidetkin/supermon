@@ -1,4 +1,4 @@
-// $Id: main.js 466 2017-06-09 05:45:33Z superuser $
+// $Id: main.js 468 2017-06-10 03:37:15Z superuser $
 
 const fs = require('fs');
 const path = require('path');
@@ -72,7 +72,7 @@ class MessageHandler
 
     onclose(socket, code, reason) {
         this.connected = false;
-        console.log('websocket: close: (%d) %s', code, reason);
+        //console.log('websocket: close: (%d) %s', code, reason);
         this.finalize();
     }
 
@@ -202,7 +202,7 @@ var application = new class Application
     }
 
     onWebSocketConnect(socket, request) {
-        console.log("websocket: accepted new connection. url: '%s'", request.url);
+        //console.log("websocket: accepted new connection. url: '%s'", request.url);
         switch (request.url) {
             case '/api': new ApiMessageHandler(socket); break;
             case '/user': new UserMessageHandler(socket); break;
