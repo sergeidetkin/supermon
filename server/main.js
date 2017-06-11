@@ -1,4 +1,4 @@
-// $Id: main.js 468 2017-06-10 03:37:15Z superuser $
+// $Id: main.js 472 2017-06-11 23:05:45Z superuser $
 
 const fs = require('fs');
 const path = require('path');
@@ -9,7 +9,6 @@ const schema = require('./schema');
 const util = require('util');
 
 const clients = {};
-const handlers = {};
 
 class EventSource extends EventEmitter
 {
@@ -29,17 +28,11 @@ class EventSource extends EventEmitter
 }
 
 const user = new EventSource();
-//const api = new EventSource();
+const api = new EventSource();
 
 class MessageHandler
 {
     constructor(socket) {
-        if (!handlers[this.name]) {
-            handlers[this.name] = new Set();
-        }
-
-        handlers[this.name].add(this);
-
         socket.on('message', (message) => { this.onmessage(socket, message); });
         socket.on('close', (code, reason) => { this.onclose(socket, code, reason); });
         socket.on('error', (error) => { this.onerror(error); });
@@ -58,11 +51,13 @@ class MessageHandler
 
     onmessage(socket, buffer) {
         try {
-            console.log("received: '%s'", buffer);
             const message = JSON.parse(buffer);
             const id = Object.keys(message)[0];
             if ('function' == typeof(this['on'+id])) {
                 this['on'+id](message[id]);
+            }
+            else {
+                console.log("unhandled: '%s'", buffer);
             }
         }
         catch (e) {
@@ -81,16 +76,7 @@ class MessageHandler
         console.error('websocket: error: ', error);
     }
 
-    publish(message) {
-        if (!this.connected) return;
-        console.log('publish:', message);
-        for (let handler of handlers[this.name]) {
-            handler.send(message);
-        }
-    }
-
     finalize() {
-        handlers[this.name].delete(this);
     }
 }
 
@@ -98,10 +84,7 @@ class ApiMessageHandler extends MessageHandler
 {
     constructor(socket) {
         super(socket);
-    }
-
-    get name() {
-        return 'api';
+        api.subscribe(this, 'command', this.oncommand);
     }
 
     onclose(socket, code, reason) {
@@ -144,6 +127,25 @@ class ApiMessageHandler extends MessageHandler
         //this.ping();
     }
 
+    onwarning(message) {
+        const client = clients[this.clientId];
+        const warning = message;
+        warning.when = Date.now();
+        warning.source = { name: client.name, instance: client.instance };
+        user.notify('warning', message);
+    }
+
+    oncommand(event) {
+        if (this.clientId != event.clientId) return;
+        const message = {};
+        message[event.id] = event.arguments;
+        this.send(JSON.stringify(message));
+    }
+
+    finalize() {
+        api.unsubscribe('command', this.oncommand);
+        super.finalize();
+    }
 }
 
 class UserMessageHandler extends MessageHandler
@@ -153,28 +155,35 @@ class UserMessageHandler extends MessageHandler
 
         user.subscribe(this, 'login', this.onlogin);
         user.subscribe(this, 'disconnect', this.ondisconnect);
+        user.subscribe(this, 'warning', this.onwarning);
 
         const message = { "clients" : clients };
         this.send(JSON.stringify(message));
     }
 
-    get name() {
-        return 'user';
-    }
-
     onlogin(event) {
-        const message = { "login" : event };
+        const message = { login: event };
         this.send(JSON.stringify(message));
     }
 
     ondisconnect(event) {
-        const message = { "disconnect" : event };
+        const message = { disconnect: event };
+        this.send(JSON.stringify(message));
+    }
+
+    oncommand(event) {
+        api.notify('command', event);
+    }
+
+    onwarning(event) {
+        const message = { warning: event };
         this.send(JSON.stringify(message));
     }
 
     finalize() {
         user.unsubscribe('login', this.onlogin);
         user.unsubscribe('disconnect', this.ondisconnect);
+        user.unsubscribe('warning', this.onwarning);
         super.finalize();
     }
 

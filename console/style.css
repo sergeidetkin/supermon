@@ -110,7 +110,7 @@ div p {
     padding-left: 8px;
     padding-right: 8px;
     color:white;
-    background-color:rgb(104, 137, 198);
+    background-color:rgb(88, 159, 215);
 }
 
 #status-bar > .item:not(:first-child) {
@@ -190,7 +190,7 @@ div p {
 }
 
 .warning > .lvi-label > .lvi-led {
-    background-color: amber;
+    background-color: darkorange;
 }
 
 .warning > .lvi-label > .lvi-led::after {
@@ -199,11 +199,11 @@ div p {
 
 .selected {
     color: white;
-    background-color: rgb(104, 137, 198);
+    background-color: rgb(88, 159, 215);
 }
 
 .selected:nth-child(even) {
-    background-color: rgb(104, 137, 198);
+    background-color: rgb(88, 159, 215);
 }
 
 

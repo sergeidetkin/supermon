@@ -1,4 +1,4 @@
-// $Id: main.cpp 464 2017-06-09 05:09:20Z superuser $
+// $Id: main.cpp 472 2017-06-11 23:05:45Z superuser $
 
 #include <exception>
 #include <iostream>
@@ -6,6 +6,7 @@
 #include <thread>
 
 #include "monitor.h"
+#include "boost/property_tree/json_parser.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -44,11 +45,21 @@ int main(int argc, char* argv[])
             });
         };
 
-        agent.onmessage = [&io](std::shared_ptr<std::string> text)
+        agent.onmessage = [&io, &agent](const std::string& tag, std::shared_ptr<boost::property_tree::ptree> request)
         {
-            io.post([&io, text]()
+            io.post([&io, &agent, tag, request]()
             {
-                std::cout << std::this_thread::get_id() << ": " << *text << std::endl;
+                std::cout << std::this_thread::get_id() << ": tag=" << tag << ", message=";
+
+                boost::property_tree::write_json(std::cout, *request, true);
+
+                boost::property_tree::ptree response;
+                response.put("warning.message", "got '" + tag + "' message");
+                agent.send(response);
+
+                if ("shutdown" == tag) {
+                    io.stop();
+                }
             });
         };
 

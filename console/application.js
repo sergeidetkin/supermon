@@ -1,4 +1,4 @@
-// $Id: application.js 469 2017-06-10 11:56:24Z superuser $
+// $Id: application.js 472 2017-06-11 23:05:45Z superuser $
 
 class Application
 {
@@ -26,9 +26,9 @@ class Application
         var client = this.clients[id];
         if (client.hasOwnProperty('commands')) {
             for (var key in client.commands) {
-                var command = client.commands[key];
+                //var command = client.commands[key];
                 var it = CommandListViewItem.create();
-                it.bind(command, client);
+                it.bind(key, client);
                 this.commandsListView.add(it);
             }
         }
@@ -43,26 +43,56 @@ class Application
 
         var table = document.createElement('table');
 
-        for (var key in command.options) {
-            var option = command.options[key];
+        for (var key in command.parameters) {
+            var parameter = command.parameters[key];
+            var args = command.arguments || {};
+            if (undefined == command.arguments) command.arguments = args;
             var row = table.insertRow();
             var cell = row.insertCell();
-            cell.textContent = option.name;
+            cell.textContent = parameter.name;
             cell = row.insertCell();
-            if (undefined == option.values || 0 == option.values.length) {
+            if (undefined == parameter.values || 0 == parameter.values.length) {
                 var input = document.createElement('input');
+                input.type = 'text';
+                input.value = args[key] || '';
                 cell.appendChild(input);
+                // careful, we are creating a generator function to properly capture args, key and input
+                input.addEventListener('input',
+                    (function(args, key, input) {
+                        return function() {
+                            args[key] = input.value;
+                        };
+                    })(args, key, input)
+                );
             }
             else {
                 var select = document.createElement('select');
-                for (var n = 0; n < option.values.length; ++n) {
-                    var v = option.values[n];
-                    var o = document.createElement('option');
-                    o.text = v.name;
-                    o.value = v.value;
-                    select.add(o);
+                for (var n = 0; n < parameter.values.length; ++n) {
+                    var option = document.createElement('option');
+                    var value = parameter.values[n];
+                    option = document.createElement('option');
+                    option.text = value.name;
+                    option.value = value.value;
+                    select.add(option);
+                    if (0 == n && undefined == args[key]) {
+                        select.selectedIndex = 0; // because select makes the first item appera as selected, but does not change the selectedIndex
+                        args[key] = option.value;
+                    }
+                    if (args[key] == option.value) {
+                        select.selectedIndex = n;
+                    }
                 }
                 cell.appendChild(select);
+                select.addEventListener('change',
+                    (function(args, key, parameter, select) {
+                        return function() {
+                            args[key] = parameter.values[select.selectedIndex].value;
+                        };
+                    })(args, key, parameter, select)
+                );
+            }
+            if (undefined == args[key]) {
+                args[key] = '';
             }
         }
 
@@ -70,6 +100,7 @@ class Application
 
         div = document.createElement('div');
         var button = document.createElement('input');
+        button.id = 'execute';
         button.type = 'button';
         button.value = 'Execute';
         div.appendChild(button);
@@ -79,34 +110,48 @@ class Application
         return form;
     }
 
-    updateOptionsView(command, target) {
+    submitCommand(commandId, target) {
+        var message = {
+            command: {
+                id: commandId,
+                clientId: target.name + '.' + target.instance,
+                arguments: target.commands[commandId].arguments || {}
+            }
+        };
+        this.websocket.send(JSON.stringify(message));
+    }
+
+    updateOptionsView(commandId, target) {
         var element = document.querySelector('#input');
         if (element.firstElementChild) {
             element.removeChild(element.firstElementChild);
         }
-        if (null == command || null == target) {
+        if (null == commandId || null == target) {
             return;
         }
-        console.log('->', target.name, command.name);
+        var command = target.commands[commandId];
+        //console.log('->', target.name, command.name);
         var form = this.createInputForm(command);
+        var execute = form.querySelector('#execute');
+        execute.addEventListener('click', this.submitCommand.bind(this, commandId, target));
         element.appendChild(form);
     }
 
     onSelectedCommandChanged(e) {
         var status = document.querySelector('#status-bar > .item > #command');
-        var command = null;
+        var commandId = null;
         var target = null;
         if (-1 != e.selectedIndex) {
-            command = this.commandsListView.element.children[e.selectedIndex].command;
+            commandId = this.commandsListView.element.children[e.selectedIndex].command;
             target = this.commandsListView.element.children[e.selectedIndex].target;
-            status.textContent = command.name;
+            status.textContent = target.commands[commandId].name;
             status.parentElement.style.display = '';
         }
         else {
             status.textContent = '';
             status.parentElement.style.display = 'none';
         }
-        this.updateOptionsView(command, target);
+        this.updateOptionsView(commandId, target);
     }
 
     onSelectedClientChanged(e) {
@@ -114,7 +159,8 @@ class Application
         var id = -1;
         if (-1 != e.selectedIndex) {
             id = this.processListView.element.children[e.selectedIndex].id;
-            status.textContent = this.clients[id].name;
+            var client = this.clients[id];
+            status.textContent = client.name + '.' + client.instance;
             status.parentElement.style.display = '';
         }
         else {
@@ -139,6 +185,7 @@ class Application
             this.processListView.add(it);
         }
         else {
+            Object.assign(client.commands, this.clients[id].commands);
             Object.assign(this.clients[id], client);
 
             var itemElement = this.processListView.element.querySelector('#'+id);
@@ -190,9 +237,9 @@ class Application
     connect() {
         this.reset(false);
 
-        this.ws = new WebSocket('ws://' + document.location.host + '/user');
+        this.websocket = new WebSocket('ws://' + document.location.host + '/user');
 
-        this.ws.onmessage = function(e) {
+        this.websocket.onmessage = function(e) {
             try {
                 var message = JSON.parse(e.data);
                 var id = Object.keys(message)[0];
@@ -208,7 +255,7 @@ class Application
             }
         }.bind(this);
 
-        this.ws.onopen = function() {
+        this.websocket.onopen = function() {
             console.log('connected');
             this.reconnectAttemptCount = 0;
             this.reset(true);
@@ -233,8 +280,8 @@ class Application
             
         }.bind(this);
 
-        this.ws.onclose = reconnect;
-        this.ws.onerror = reconnect;
+        this.websocket.onclose = reconnect;
+        this.websocket.onerror = reconnect;
     }
 
     reset(online) {
@@ -258,6 +305,21 @@ class Application
         console.debug('login', message);
         this.updateClientItem(message);
         this.updateStatusBar();
+    }
+
+    onwarning(message) {
+        console.debug('warning', message);
+        var id = message.source.name + '_' + message.source.instance;
+        var element = this.processListView.element.querySelector('#'+id);
+        var it = null;
+        if (null != element) {
+            it = new ProcessListViewItem(element);
+            it.warning = true;
+            it.info = (new Date(message.when)).toLocaleTimeString('en-GB') + ': ' + message.message;
+        }
+        if (null == it) {
+            console.error('onwarning() failed: list view item with id "', '#'+id, '" not found');
+        }
     }
 
     ondisconnect(message) {

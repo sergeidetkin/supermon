@@ -1,4 +1,4 @@
-// $Id: monitor.cpp 464 2017-06-09 05:09:20Z superuser $
+// $Id: monitor.cpp 472 2017-06-11 23:05:45Z superuser $
 
 #include <iostream>
 #include <exception>
@@ -32,10 +32,6 @@ namespace monitor
 
     void agent::init()
     {
-        onmessage = [](std::shared_ptr<std::string> text){
-            std::clog << std::this_thread::get_id() << ": received: " << *text << std::endl;
-        };
-
         _work = std::make_shared<boost::asio::io_service::work>(_io);
         _result = std::async(std::launch::async, [this]()
         {
@@ -67,9 +63,22 @@ namespace monitor
         }
     }
 
-    void agent::dispatch(const std::shared_ptr<std::string>& text)
+    void agent::dispatch(const std::shared_ptr<boost::asio::streambuf>& streambuf)
     {
-        onmessage(text);
+        std::istream is(&*streambuf);
+        auto message = std::make_shared<boost::property_tree::ptree>();
+        try
+        {
+            boost::property_tree::read_json(is, *message);
+            auto body = std::shared_ptr<boost::property_tree::ptree>(message, &message->begin()->second);
+
+            onmessage(message->begin()->first, body);
+        }
+        catch (const boost::property_tree::json_parser_error& e)
+        {
+            // TODO
+            std::cerr << "failed to parse incoming json message" << std::endl;
+        }
         listen();
     }
 
@@ -111,8 +120,7 @@ namespace monitor
                 }
                 else if (beast::websocket::opcode::text == *opcode)
                 {
-                    auto text = std::make_shared<std::string>(boost::asio::buffers_begin(streambuf->data()), boost::asio::buffers_end(streambuf->data()));
-                    dispatch(text);
+                    dispatch(streambuf);
                     streambuf->consume(streambuf->size()); // do we have to do this?
                 }
             }

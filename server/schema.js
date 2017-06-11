@@ -1,7 +1,5 @@
-// $Id: schema.js 469 2017-06-10 11:56:24Z superuser $
 
 var enumerations = {};
-var commands = {};
 
 enumerations.time =
 [
@@ -9,16 +7,19 @@ enumerations.time =
     { name: "Later", value: "1"}
 ];
 
+
+var commands = {};
+
 commands.monitor_test =
 {
-    ping: {
+    pong: {
         name: "pong process",
         description: "Pong selected process",
-        options: [
-            {
+        parameters: {
+            user: {
                 name: "User"
             }
-        ]
+        }
     },
     shutdown: {
         name: "kill",
@@ -41,31 +42,30 @@ commands.monitor =
     ping: {
         name: "ping process",
         description: "Ping selected process",
-        options: [
-            {
+        parameters: {
+            user: {
                 name: "User"
             }
-        ]
+        }
     },
     shutdown: {
         name: "shutdown process",
         description: "Send shutdown notification to the selected process",
-        options: [
-            {
+        parameters: {
+            user: {
                 name: "User"
             },
-            {
-                name: "Time1",
+            time1: {
+                name: "Time 1",
                 values: enumerations.time
             },
-            {
-                name: "Time2",
+            time2: {
+                name: "Time 2",
                 values: enumerations.time
             }
-        ]
+        }
     }
 };
 
-exports.enumerations = enumerations;
 exports.commands = commands;
 

@@ -1,4 +1,4 @@
-// $Id: monitor.h 464 2017-06-09 05:09:20Z superuser $
+// $Id: monitor.h 472 2017-06-11 23:05:45Z superuser $
 
 #ifndef rotor_monitor_h
 #define rotor_monitor_h
@@ -40,14 +40,15 @@ namespace monitor
         void init();
         void listen();
         void retry(std::chrono::seconds timeout = std::chrono::seconds(5));
-        void dispatch(const std::shared_ptr<std::string>&);
+        void dispatch(const std::shared_ptr<boost::asio::streambuf>&);
 
     public:
-        std::function<void (std::exception_ptr)>               onabort = [](std::exception_ptr){};
-        std::function<void (const boost::system::error_code&)> onerror = [](const boost::system::error_code&){};
-        std::function<void ()>                                 onconnect = [](){};
-        std::function<void (const boost::system::error_code&)> ondisconnect = [](const boost::system::error_code&){};
-        std::function<void (std::shared_ptr<std::string>)>     onmessage = [](std::shared_ptr<std::string>){};
+        std::function<void (std::exception_ptr)>                           onabort = [](std::exception_ptr){};
+        std::function<void (const boost::system::error_code&)>             onerror = [](const boost::system::error_code&){};
+        std::function<void ()>                                             onconnect = [](){};
+        std::function<void (const boost::system::error_code&)>             ondisconnect = [](const boost::system::error_code&){};
+        std::function<void (const std::string& tag,
+                            std::shared_ptr<boost::property_tree::ptree>)> onmessage = [](const std::string&, std::shared_ptr<boost::property_tree::ptree>){};
 
     private:
         config                                                  _config;
