@@ -1,4 +1,4 @@
-// $Id: monitor.h 472 2017-06-11 23:05:45Z superuser $
+// $Id: monitor.h 473 2017-06-14 04:32:44Z superuser $
 
 #ifndef rotor_monitor_h
 #define rotor_monitor_h
@@ -21,8 +21,9 @@ namespace monitor
     {
         std::string   name;
         std::string   instance;
-        std::string   host;
-        std::uint16_t port;
+        std::string   host = {"localhost"};
+        std::uint16_t port = 8080;
+        std::string   url = {"/api"};
     };
 
     class agent final
@@ -33,8 +34,11 @@ namespace monitor
 
     public:
         void connect();
-        void send(const boost::property_tree::ptree&, bool pretty = true);
         void shutdown();
+
+    public:
+        void send(const boost::property_tree::ptree&, bool indent = false);
+        void send(const std::string& tag, const std::string& message);
 
     protected:
         void init();

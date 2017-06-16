@@ -41,7 +41,6 @@ div.section-header {
 }
 
 #output {
-    padding: 8px;
 }
 
 #input {
@@ -98,10 +97,19 @@ div p {
     margin: 2px;
 }
 
-#status-bar {
-    flex: 0 0 auto;
+.tab-bar {
+    flex: 0 0 auto !important;
     /*background-color: rgb(230,230,230);*/
     border-bottom: 1px solid rgb(160,160,160);
+    cursor: default;
+}
+
+.tab-bar > .item {
+    flex: 0 0 auto;
+    line-height: 1.5em;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-right: 1px solid rgb(160,160,160);
 }
 
 #status-bar > .item:first-child {
@@ -110,6 +118,7 @@ div p {
     padding-left: 8px;
     padding-right: 8px;
     color:white;
+    border: none;
     background-color:rgb(88, 159, 215);
 }
 
@@ -119,6 +128,10 @@ div p {
     padding-left: 8px;
     padding-right: 8px;
     border-right: 1px solid rgb(160,160,160);
+}
+
+#channel-view {
+    padding: 8px;
 }
 
 .list-view {

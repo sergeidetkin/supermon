@@ -1,4 +1,4 @@
-// $Id: monitor.cpp 472 2017-06-11 23:05:45Z superuser $
+// $Id: monitor.cpp 473 2017-06-14 04:32:44Z superuser $
 
 #include <iostream>
 #include <exception>
@@ -127,14 +127,21 @@ namespace monitor
         );
     }
 
-    void agent::send(const boost::property_tree::ptree& message, bool pretty)
+    void agent::send(const boost::property_tree::ptree& message, bool indent)
     {
         boost::asio::streambuf buffer;
         std::ostream os(&buffer);
 
-        boost::property_tree::write_json(os, message, pretty);
+        boost::property_tree::write_json(os, message, indent);
 
         _websocket.write(buffer.data());
+    }
+
+    void agent::send(const std::string& tag, const std::string& message)
+    {
+        boost::property_tree::ptree msg;
+        msg.put(tag + ".message", message);
+        send(msg);
     }
 
     void agent::connect()
@@ -147,7 +154,7 @@ namespace monitor
             {
                 if (!error)
                 {
-                    _websocket.handshake(_config.host, "/api");
+                    _websocket.handshake(_config.host, _config.url);
 
                     std::vector<std::string> words;
                     boost::algorithm::split(words, _config.name, boost::algorithm::is_any_of("/\\"));

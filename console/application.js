@@ -1,4 +1,4 @@
-// $Id: application.js 472 2017-06-11 23:05:45Z superuser $
+// $Id: application.js 473 2017-06-14 04:32:44Z superuser $
 
 class Application
 {
@@ -138,7 +138,7 @@ class Application
     }
 
     onSelectedCommandChanged(e) {
-        var status = document.querySelector('#status-bar > .item > #command');
+        var status = document.querySelector('.tab-bar > .item > #command');
         var commandId = null;
         var target = null;
         if (-1 != e.selectedIndex) {
@@ -155,7 +155,7 @@ class Application
     }
 
     onSelectedClientChanged(e) {
-        var status = document.querySelector('#status-bar > .item > #client');
+        var status = document.querySelector('.tab-bar > .item > #client');
         var id = -1;
         if (-1 != e.selectedIndex) {
             id = this.processListView.element.children[e.selectedIndex].id;
@@ -214,11 +214,11 @@ class Application
         var bg = this.online ? '#00cc00' : 'crimson';
         //var fg = this.online ? 'rgb(80,80,80)' : 'white';
         var fg = 'white';
-        var status = document.querySelector('#status-bar > .item > #status');
+        var status = document.querySelector('.tab-bar > .item > #status');
         status.textContent = this.online ? document.location.host : 'connecting...';
         status.style.color = fg;
         status.parentElement.style.backgroundColor = bg;
-        document.querySelector('#status-bar > .item > #connected').textContent = this.connectedClientsCount;
+        document.querySelector('.tab-bar > .item > #connected').textContent = this.connectedClientsCount;
     }
 
     get connectedClientsCount() {
@@ -239,9 +239,9 @@ class Application
 
         this.websocket = new WebSocket('ws://' + document.location.host + '/user');
 
-        this.websocket.onmessage = function(e) {
+        this.websocket.onmessage = function(message) {
             try {
-                var message = JSON.parse(e.data);
+                var message = JSON.parse(message.data);
                 var id = Object.keys(message)[0];
 
                 if ('function' == typeof(this['on'+id])) {
@@ -250,8 +250,8 @@ class Application
 
                 return;
             }
-            catch (ex) {
-                console.log('unhandled:', e.data);
+            catch (e) {
+                console.log('unhandled:', message.data);
             }
         }.bind(this);
 
@@ -275,7 +275,7 @@ class Application
             }
             else {
                 console.error('failed to reconnect');
-                document.querySelector('#status-bar > .item > #status').textContent = 'offline';
+                document.querySelector('.tab-bar > .item > #status').textContent = 'offline';
             }
             
         }.bind(this);

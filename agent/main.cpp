@@ -1,4 +1,4 @@
-// $Id: main.cpp 472 2017-06-11 23:05:45Z superuser $
+// $Id: main.cpp 473 2017-06-14 04:32:44Z superuser $
 
 #include <exception>
 #include <iostream>
@@ -7,6 +7,7 @@
 
 #include "monitor.h"
 #include "boost/property_tree/json_parser.hpp"
+
 
 int main(int argc, char* argv[])
 {
@@ -17,7 +18,7 @@ int main(int argc, char* argv[])
         boost::asio::io_service io;
         boost::asio::io_service::work work(io);
 
-        monitor::agent agent({argv[0], "abc", "localhost", 8080});
+        monitor::agent agent({argv[0], 1 < argc ? argv[1] : "abc", "localhost", 8080});
 
         agent.onerror = [&io](const boost::system::error_code& error)
         {

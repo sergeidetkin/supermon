@@ -1,4 +1,4 @@
-// $Id: views.js 471 2017-06-11 19:49:28Z superuser $
+// $Id: views.js 473 2017-06-14 04:32:44Z superuser $
 
 class View
 {
@@ -118,6 +118,7 @@ class ProcessListViewItem extends ListViewItem
     set info(text) {
         var element = this.element.querySelector('.lvi-info');
         element.textContent = text;
+        element.title = text;
     }
 }
 
