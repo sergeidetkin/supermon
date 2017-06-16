@@ -1,0 +1,14 @@
+{
+  "name": "supermon",
+  "version": "1.0.0",
+  "description": "This is supermon",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sergei Detkin",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "ws": "^3.0.0"
+  }
+}
