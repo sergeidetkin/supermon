@@ -259,7 +259,7 @@ var application = new class Application
 //            return this.sendSchema(response);
 //        }
 
-        const fname = path.join(__dirname, '/../html', url);
+        const fname = path.join(__dirname, '/public', url);
 
         if (fs.existsSync(fname)) {
             const stat = fs.statSync(fname);
