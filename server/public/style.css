@@ -102,6 +102,7 @@ div p {
     /*background-color: rgb(230,230,230);*/
     border-bottom: 1px solid rgb(160,160,160);
     cursor: default;
+    min-height: 1.5em;
 }
 
 .tab-bar > .item {

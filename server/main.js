@@ -23,6 +23,7 @@ const schema = require('./schema');
 const util = require('util');
 
 const clients = {};
+const channels ={};
 
 class EventSource extends EventEmitter
 {
@@ -88,6 +89,7 @@ class MessageHandler
     onerror(error) {
         this.connected = false;
         console.error('websocket: error: ', error);
+        this.finalize();
     }
 
     finalize() {
@@ -135,6 +137,15 @@ class ApiMessageHandler extends MessageHandler
         login.state = 'connected';
         //console.log(util.inspect(schema, false, null));
         login.commands = schema.commands[login.name];
+        login.channels = schema.channels[login.name];
+
+        if (!channels.hasOwnProperty(login.name + '.' + login.instance)) {
+            let channel = {};
+            for (let topic in login.channels) {
+                channel[topic] = new EventSource();
+            }
+            channels[login.name + '.' + login.instance] = channel;
+        }
 
         user.notify('login', message);
 
@@ -167,11 +178,41 @@ class UserMessageHandler extends MessageHandler
     constructor(socket) {
         super(socket);
 
+        this.topic = null;
+
         user.subscribe(this, 'login', this.onlogin);
         user.subscribe(this, 'disconnect', this.ondisconnect);
         user.subscribe(this, 'warning', this.onwarning);
 
         const message = { "clients" : clients };
+        this.send(JSON.stringify(message));
+    }
+
+    onunsubscribe() {
+        console.log('unsubscribe');
+        if (null != this.topic) {
+            channels[this.topic.name + '.' + this.topic.instance][this.topic.channel].unsubscribe('update', this.onupdate);
+            this.topic = null;
+        }
+    }
+
+    onsubscribe(message) {
+        console.log(JSON.stringify(message));
+        if (null != this.topic) {
+            if (this.topic.channel != message.channel || this.topic.instance != message.instance || this.topic.name != message.name) {
+                this.onunsubscribe();
+                this.topic = message;
+                channels[this.topic.name + '.' + this.topic.instance][this.topic.channel].subscribe(this, 'update', this.onupdate);
+            }
+        }
+        else {
+            this.topic = message;
+            channels[this.topic.name + '.' + this.topic.instance][this.topic.channel].subscribe(this, 'update', this.onupdate);
+        }
+    }
+
+    onupdate(event) {
+        const message = { update: event };
         this.send(JSON.stringify(message));
     }
 
@@ -195,6 +236,7 @@ class UserMessageHandler extends MessageHandler
     }
 
     finalize() {
+        this.onunsubscribe();
         user.unsubscribe('login', this.onlogin);
         user.unsubscribe('disconnect', this.ondisconnect);
         user.unsubscribe('warning', this.onwarning);

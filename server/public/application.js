@@ -25,11 +25,42 @@ class Application
         this.commandsListView = new ListView(document.querySelector('#commands > .list-view'));
         this.commandsListView.addEventListener('change', this.onSelectedCommandChanged.bind(this));
 
+        this.channelsListView = new ListView(document.querySelector('#channel-bar'));
+        this.channelsListView.addEventListener('change', this.onSelectedChannelChanged.bind(this));
+
         this.reconnectTimeout = 3000; // ms
         this.reconnectAttemptsMax = Math.floor(60*1000 / this.reconnectTimeout);
         this.reconnectAttemptCount = 0;
 
         this.connect();
+    }
+
+    onSelectedChannelChanged(e) {
+        this.websocket.send(JSON.stringify({ unsubscribe: {} }));
+
+        if (-1 != e.selectedIndex) {
+            var topic = this.channelsListView.element.children[e.selectedIndex].target;
+            var message = {
+                subscribe: topic
+            };
+            this.websocket.send(JSON.stringify(message));
+        }
+    }
+
+    updateChannelsView(id) {
+        this.channelsListView.clear()
+        if (-1 == id) {
+            return;
+        }
+        var client = this.clients[id];
+        if (client.hasOwnProperty('channels')) {
+            for (var key in client.channels) {
+                //var command = client.commands[key];
+                var it = ChannelsListViewItem.create();
+                it.bind(key, client);
+                this.channelsListView.add(it);
+            }
+        }
     }
 
     updateCommandsView(id) {
@@ -135,7 +166,7 @@ class Application
         this.websocket.send(JSON.stringify(message));
     }
 
-    updateOptionsView(commandId, target) {
+    updateInputView(commandId, target) {
         var element = document.querySelector('#input');
         if (element.firstElementChild) {
             element.removeChild(element.firstElementChild);
@@ -152,7 +183,7 @@ class Application
     }
 
     onSelectedCommandChanged(e) {
-        var status = document.querySelector('.tab-bar > .item > #command');
+        var status = document.querySelector('#status-bar > .item > #command');
         var commandId = null;
         var target = null;
         if (-1 != e.selectedIndex) {
@@ -165,11 +196,11 @@ class Application
             status.textContent = '';
             status.parentElement.style.display = 'none';
         }
-        this.updateOptionsView(commandId, target);
+        this.updateInputView(commandId, target);
     }
 
     onSelectedClientChanged(e) {
-        var status = document.querySelector('.tab-bar > .item > #client');
+        var status = document.querySelector('#status-bar > .item > #client');
         var id = -1;
         if (-1 != e.selectedIndex) {
             id = this.processListView.element.children[e.selectedIndex].id;
@@ -182,6 +213,7 @@ class Application
             status.parentElement.style.display = 'none';
         }
         this.updateCommandsView(id);
+        this.updateChannelsView(id);
     }
 
     updateClientItem(client) {
@@ -228,11 +260,11 @@ class Application
         var bg = this.online ? '#00cc00' : 'crimson';
         //var fg = this.online ? 'rgb(80,80,80)' : 'white';
         var fg = 'white';
-        var status = document.querySelector('.tab-bar > .item > #status');
+        var status = document.querySelector('#status-bar > .item > #status');
         status.textContent = this.online ? document.location.host : 'connecting...';
         status.style.color = fg;
         status.parentElement.style.backgroundColor = bg;
-        document.querySelector('.tab-bar > .item > #connected').textContent = this.connectedClientsCount;
+        document.querySelector('#status-bar > .item > #connected').textContent = this.connectedClientsCount;
     }
 
     get connectedClientsCount() {
@@ -289,7 +321,7 @@ class Application
             }
             else {
                 console.error('failed to reconnect');
-                document.querySelector('.tab-bar > .item > #status').textContent = 'offline';
+                document.querySelector('#status-bar > .item > #status').textContent = 'offline';
             }
             
         }.bind(this);

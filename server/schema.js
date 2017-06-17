@@ -86,5 +86,21 @@ commands.monitor =
     }
 };
 
+var channels = {};
+
+channels.monitor_test =
+{
+    log: {
+        name: "log messages",
+    },
+    warnings: {
+        name: "warnings"
+    },
+    errors: {
+        name: "errors"
+    }
+};
+
 exports.commands = commands;
+exports.channels = channels;
 

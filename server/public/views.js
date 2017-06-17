@@ -38,11 +38,6 @@ class ListViewItem extends View
     constructor(element) {
         super(element);
     }
-
-    static create() {
-        var element = document.createElement('div');
-        return new ListViewItem(element);
-    }
 }
 
 class CommandListViewItem extends ListViewItem
@@ -61,11 +56,31 @@ class CommandListViewItem extends ListViewItem
     bind(commandId, target) {
         var command = target.commands[commandId];
         this.element.textContent = command.name;
-        this.element.title = command.description;
+        this.element.title = command.description || command.name;
         this.element.command = commandId;
         this.element.target = target;
     }
+}
 
+class ChannelsListViewItem extends ListViewItem
+{
+    constructor(element) {
+        super(element);
+    }
+
+    static create() {
+        var element = document.createElement('div');
+        element.classList.add('item');
+
+        return new ChannelsListViewItem(element);
+    }
+
+    bind(key, client) {
+        var channel = client.channels[key];
+        this.element.textContent = channel.name;
+        this.element.title = channel.description || channel.name;
+        this.element.target = { name: client.name, instance: client.instance, channel: key };
+    }
 }
 
 class ProcessListViewItem extends ListViewItem
