@@ -1,0 +1,302 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		224ED42B1EF39A7300D926C4 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 224ED42A1EF39A7300D926C4 /* main.cpp */; };
+		2276DB911EF3A7BA00A48F47 /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2276DB901EF3A7BA00A48F47 /* libboost_system.a */; };
+		228F0B3F1EF4DFC400E90748 /* agent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 228F0B3E1EF4DFC400E90748 /* agent.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		224ED41E1EF398D100D926C4 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		224ED4201EF398D100D926C4 /* monitor_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = monitor_test; sourceTree = BUILT_PRODUCTS_DIR; };
+		224ED42A1EF39A7300D926C4 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		2276DB901EF3A7BA00A48F47 /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = "../../../boost-1.65/bin.v2/libs/system/build/darwin-4.2.1/release/link-static/threading-multi/libboost_system.a"; sourceTree = "<group>"; };
+		228F0B3C1EF4DFC400E90748 /* agent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = agent.h; path = ../include/supermon/agent.h; sourceTree = "<group>"; };
+		228F0B3E1EF4DFC400E90748 /* agent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = agent.cpp; path = ../src/agent.cpp; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		224ED41D1EF398D100D926C4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2276DB911EF3A7BA00A48F47 /* libboost_system.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		224ED4171EF398D100D926C4 = {
+			isa = PBXGroup;
+			children = (
+				228F0B401EF4DFD900E90748 /* supermon */,
+				224ED42A1EF39A7300D926C4 /* main.cpp */,
+				2276DB951EF3A85C00A48F47 /* libs */,
+				224ED4211EF398D100D926C4 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		224ED4211EF398D100D926C4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				224ED4201EF398D100D926C4 /* monitor_test */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2276DB951EF3A85C00A48F47 /* libs */ = {
+			isa = PBXGroup;
+			children = (
+				2276DB901EF3A7BA00A48F47 /* libboost_system.a */,
+			);
+			name = libs;
+			sourceTree = "<group>";
+		};
+		228F0B401EF4DFD900E90748 /* supermon */ = {
+			isa = PBXGroup;
+			children = (
+				228F0B3E1EF4DFC400E90748 /* agent.cpp */,
+				228F0B3C1EF4DFC400E90748 /* agent.h */,
+			);
+			name = supermon;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		224ED41F1EF398D100D926C4 /* monitor_test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 224ED4271EF398D100D926C4 /* Build configuration list for PBXNativeTarget "monitor_test" */;
+			buildPhases = (
+				224ED41C1EF398D100D926C4 /* Sources */,
+				224ED41D1EF398D100D926C4 /* Frameworks */,
+				224ED41E1EF398D100D926C4 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = monitor_test;
+			productName = monitor_test;
+			productReference = 224ED4201EF398D100D926C4 /* monitor_test */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		224ED4181EF398D100D926C4 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0620;
+				ORGANIZATIONNAME = "Sergei Detkin";
+				TargetAttributes = {
+					224ED41F1EF398D100D926C4 = {
+						CreatedOnToolsVersion = 6.2;
+					};
+				};
+			};
+			buildConfigurationList = 224ED41B1EF398D100D926C4 /* Build configuration list for PBXProject "monitor_test" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 224ED4171EF398D100D926C4;
+			productRefGroup = 224ED4211EF398D100D926C4 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				224ED41F1EF398D100D926C4 /* monitor_test */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		224ED41C1EF398D100D926C4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				224ED42B1EF39A7300D926C4 /* main.cpp in Sources */,
+				228F0B3F1EF4DFC400E90748 /* agent.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		224ED4251EF398D100D926C4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BEAST_DIR = "$(HOME)/src/Beast";
+				BOOST_DIR = "$(HOME)/src/boost-1.65";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CONFIGURATION_TEMP_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(BOOST_DIR)",
+					"$(BEAST_DIR)/include",
+					..,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OBJROOT = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		224ED4261EF398D100D926C4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BEAST_DIR = "$(HOME)/src/Beast";
+				BOOST_DIR = "$(HOME)/src/boost-1.65";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CONFIGURATION_TEMP_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(BOOST_DIR)",
+					"$(BEAST_DIR)/include",
+					..,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OBJROOT = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		224ED4281EF398D100D926C4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(BOOST_DIR)",
+					"$(BEAST_DIR)/include",
+					../include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(BOOST_DIR)/bin.v2/libs",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		224ED4291EF398D100D926C4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(BOOST_DIR)",
+					"$(BEAST_DIR)/include",
+					../include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(BOOST_DIR)/bin.v2/libs",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		224ED41B1EF398D100D926C4 /* Build configuration list for PBXProject "monitor_test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				224ED4251EF398D100D926C4 /* Debug */,
+				224ED4261EF398D100D926C4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		224ED4271EF398D100D926C4 /* Build configuration list for PBXNativeTarget "monitor_test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				224ED4281EF398D100D926C4 /* Debug */,
+				224ED4291EF398D100D926C4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 224ED4181EF398D100D926C4 /* Project object */;
+}
