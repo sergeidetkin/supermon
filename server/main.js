@@ -28,6 +28,7 @@ const channels ={};
 class EventSource extends EventEmitter
 {
     notify() {
+        //console.log('notify', this.listenerCount(arguments[0]), 'listeners', arguments[1]);
         this.emit.apply(this, arguments);
     }
 
@@ -35,10 +36,12 @@ class EventSource extends EventEmitter
         let f = handler.bind(self);
         self['on'+event] = f;
         this.on(event, f);
+        //console.log('subscribed for', event);
     }
 
     unsubscribe(event, handler) {
         this.removeListener(event, handler);
+        //console.log('unsubscribed from', event);
     }
 }
 
@@ -54,7 +57,7 @@ class MessageHandler
 
         this.send = (message) => {
             if (!this.connected) return;
-            socket.send(message, (error) => {
+            socket.send(JSON.stringify(message), (error) => {
                 if (error) {
                     console.error('websocket: failed to send <', message, '>', ' error: ', error);
                 }
@@ -69,6 +72,7 @@ class MessageHandler
             const message = JSON.parse(buffer);
             const id = Object.keys(message)[0];
             if ('function' == typeof(this['on'+id])) {
+                message[id].when = Date.now();
                 this['on'+id](message[id]);
             }
             else {
@@ -105,7 +109,7 @@ class ApiMessageHandler extends MessageHandler
 
     onclose(socket, code, reason) {
         const client = clients[this.clientId];
-        client.when = Date.now();
+        //client.when = Date.now();
 
         client.state = 'disconnected';
         client.error = { code: code, reason: reason || 'killed' };
@@ -129,7 +133,7 @@ class ApiMessageHandler extends MessageHandler
 
     onlogin(message) {
         const login = message;
-        login.when = Date.now();
+        //login.when = Date.now();
 
         this.clientId = login.name + '.' + login.instance;
         clients[this.clientId] = login;
@@ -139,12 +143,12 @@ class ApiMessageHandler extends MessageHandler
         login.commands = schema.commands[login.name];
         login.channels = schema.channels[login.name];
 
-        if (!channels.hasOwnProperty(login.name + '.' + login.instance)) {
-            let channel = {};
+        if (!channels.hasOwnProperty(this.clientId)) {
+            channels[this.clientId] = {};
+            let hub = channels[this.clientId];
             for (let topic in login.channels) {
-                channel[topic] = new EventSource();
+                hub[topic] = new EventSource();
             }
-            channels[login.name + '.' + login.instance] = channel;
         }
 
         user.notify('login', message);
@@ -152,10 +156,18 @@ class ApiMessageHandler extends MessageHandler
         //this.ping();
     }
 
+    onpush(message) {
+        const channel = channels[this.clientId][message.channel];
+        if (channel) {
+            message.event.when = message.when;
+            channel.notify('update', message.event);
+        }
+    }
+
     onwarning(message) {
         const client = clients[this.clientId];
         const warning = message;
-        warning.when = Date.now();
+        //warning.when = Date.now();
         warning.source = { name: client.name, instance: client.instance };
         user.notify('warning', message);
     }
@@ -164,7 +176,7 @@ class ApiMessageHandler extends MessageHandler
         if (this.clientId != event.clientId) return;
         const message = {};
         message[event.id] = event.arguments;
-        this.send(JSON.stringify(message));
+        this.send(message);
     }
 
     finalize() {
@@ -185,11 +197,11 @@ class UserMessageHandler extends MessageHandler
         user.subscribe(this, 'warning', this.onwarning);
 
         const message = { "clients" : clients };
-        this.send(JSON.stringify(message));
+        this.send(message);
     }
 
     onunsubscribe() {
-        console.log('unsubscribe');
+        //console.log('unsubscribe');
         if (null != this.topic) {
             channels[this.topic.name + '.' + this.topic.instance][this.topic.channel].unsubscribe('update', this.onupdate);
             this.topic = null;
@@ -197,7 +209,7 @@ class UserMessageHandler extends MessageHandler
     }
 
     onsubscribe(message) {
-        console.log(JSON.stringify(message));
+        //console.log(JSON.stringify(message));
         if (null != this.topic) {
             if (this.topic.channel != message.channel || this.topic.instance != message.instance || this.topic.name != message.name) {
                 this.onunsubscribe();
@@ -212,18 +224,19 @@ class UserMessageHandler extends MessageHandler
     }
 
     onupdate(event) {
+        //console.log(JSON.stringify(event));
         const message = { update: event };
-        this.send(JSON.stringify(message));
+        this.send(message);
     }
 
     onlogin(event) {
         const message = { login: event };
-        this.send(JSON.stringify(message));
+        this.send(message);
     }
 
     ondisconnect(event) {
         const message = { disconnect: event };
-        this.send(JSON.stringify(message));
+        this.send(message);
     }
 
     oncommand(event) {
@@ -232,7 +245,7 @@ class UserMessageHandler extends MessageHandler
 
     onwarning(event) {
         const message = { warning: event };
-        this.send(JSON.stringify(message));
+        this.send(message);
     }
 
     finalize() {
@@ -293,16 +306,6 @@ var application = new class Application
         response.end();
     }
 
-    sendSchema(response) {
-        var json = JSON.stringify(schema);
-        response.writeHead(200, {
-            'Content-Length': json.length,
-            'Content-Type': 'application/json'
-        });
-        response.write(json);
-        response.end();
-    }
-
     onHttpRequest(request, response) {
         let url = request.url == '/' ? '/index.html' : request.url;
 
@@ -310,10 +313,6 @@ var application = new class Application
             console.error('forbidden "%s"', url);
             return this.forbidden(response);
         }
-
-//        if ('/schema' == url) {
-//            return this.sendSchema(response);
-//        }
 
         const fname = path.join(__dirname, '/public', url);
 

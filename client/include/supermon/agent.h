@@ -52,6 +52,7 @@ namespace supermon
 
     public:
         void send(const boost::property_tree::ptree&, bool indent = false);
+        void send(const std::string& tag, const boost::property_tree::ptree&, bool indent = false);
         void send(const std::string& tag, const std::string& message);
 
     protected:

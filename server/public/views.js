@@ -40,6 +40,28 @@ class ListViewItem extends View
     }
 }
 
+class EventListViewItem extends ListViewItem
+{
+    constructor(element) {
+        super(element);
+    }
+
+    static create() {
+        var element = document.createElement('div');
+        element.classList.add('lv-item');
+
+        return new EventListViewItem(element);
+    }
+
+    set text(str) {
+        this.element.textContent = str;
+    }
+
+    get text() {
+        return this.element.textContent;
+    }
+}
+
 class CommandListViewItem extends ListViewItem
 {
     constructor(element) {

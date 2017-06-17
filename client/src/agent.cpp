@@ -150,6 +150,14 @@ namespace supermon
 
         _websocket.write(buffer.data());
     }
+    
+    void agent::send(const std::string& tag, const boost::property_tree::ptree& message, bool indent)
+    {
+        boost::property_tree::ptree msg;
+        msg.put("push.channel", tag);
+        msg.put_child("push.event", message);
+        send(msg, indent);
+    }
 
     void agent::send(const std::string& tag, const std::string& message)
     {

@@ -101,6 +101,19 @@ channels.monitor_test =
     }
 };
 
+channels.monitor =
+{
+    log: {
+        name: "stdout",
+    },
+    warnings: {
+        name: "warnings"
+    },
+    errors: {
+        name: "errors"
+    }
+};
+
 exports.commands = commands;
 exports.channels = channels;
 

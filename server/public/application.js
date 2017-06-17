@@ -28,6 +28,8 @@ class Application
         this.channelsListView = new ListView(document.querySelector('#channel-bar'));
         this.channelsListView.addEventListener('change', this.onSelectedChannelChanged.bind(this));
 
+        this.channelView = new ListView(document.querySelector('#channel-view'));
+
         this.reconnectTimeout = 3000; // ms
         this.reconnectAttemptsMax = Math.floor(60*1000 / this.reconnectTimeout);
         this.reconnectAttemptCount = 0;
@@ -37,6 +39,7 @@ class Application
 
     onSelectedChannelChanged(e) {
         this.websocket.send(JSON.stringify({ unsubscribe: {} }));
+        this.channelView.clear();
 
         if (-1 != e.selectedIndex) {
             var topic = this.channelsListView.element.children[e.selectedIndex].target;
@@ -285,19 +288,21 @@ class Application
 
         this.websocket = new WebSocket('ws://' + document.location.host + '/user');
 
-        this.websocket.onmessage = function(message) {
+        this.websocket.onmessage = function(msg) {
             try {
-                var message = JSON.parse(message.data);
+                var message = JSON.parse(msg.data);
                 var id = Object.keys(message)[0];
 
                 if ('function' == typeof(this['on'+id])) {
                     this['on'+id](message[id]);
                 }
-
+                else {
+                    console.debug('unhandled:', message);
+                }
                 return;
             }
             catch (e) {
-                console.log('unhandled:', message.data);
+                console.error('failed to dispatch message "' + msg.data + '":', e);
             }
         }.bind(this);
 
@@ -351,6 +356,13 @@ class Application
         console.debug('login', message);
         this.updateClientItem(message);
         this.updateStatusBar();
+    }
+
+    onupdate(message) {
+        console.debug('update', message);
+        var it = EventListViewItem.create();
+        it.text = JSON.stringify(message);
+        this.channelView.add(it);
     }
 
     onwarning(message) {

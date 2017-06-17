@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
         boost::asio::io_service io;
         boost::asio::io_service::work work(io);
 
-        supermon::agent agent({argv[0], 1 < argc ? argv[1] : "abc", "localhost", 8080});
+        supermon::agent agent({1 < argc ? argv[1] : argv[0], 2 < argc ? argv[2] : "abc", "localhost", 8080});
 
         agent.onerror = [&io](const boost::system::error_code& error)
         {
@@ -66,6 +66,9 @@ int main(int argc, char* argv[])
             {
                 //std::cout << std::this_thread::get_id() << ": tag=" << tag << ", message=";
                 //boost::property_tree::write_json(std::cout, *request, true);
+                boost::property_tree::ptree msg;
+                msg.put("text", "this is a test");
+                agent.send("log", msg);
 
                 agent.send("warning", "got '" + tag + "' message");
 
