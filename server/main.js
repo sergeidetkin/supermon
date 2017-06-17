@@ -1,4 +1,18 @@
-// $Id: main.js 472 2017-06-11 23:05:45Z superuser $
+/* This file is part of Supermon project
+
+ Supermon is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ Supermon is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with Supermon.  If not, see http://www.gnu.org/licenses/
+ */
 
 const fs = require('fs');
 const path = require('path');
