@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel='stylesheet' type='text/css' href='style.css'/>
+    <script src='views.js'></script>
+    <script src='application.js'></script>
+    <title>SUPERMON Console</title>
+</head>
+<body>
+    <div class='flex-container' style='flex-direction:column'>
+        <div id='status-bar' class='flex-container tab-bar' style='flex-direction:row'>
+            <div class='item'>SUPERMON</div>
+            <div class='item'><span id='status'>starting...</span></div>
+            <div class='item'>connected: <span id='connected'>0</span></div>
+            <div class='item' style='display:none'><span id='client'></span></div>
+            <div class='item' style='display:none'><span id='command'></span></div>
+        </div>
+        <div id='workspace' class='flex-container' style='flex-direction:row'>
+            <div id='left' class='flex-container' style='flex-direction:column'>
+                <div id='apps' class='flex-container' style='flex-direction:column'>
+                    <div class='section-header'>Applications</div>
+                    <div class='list-view'>
+                    </div>
+                </div>
+                <div id='commands' class='flex-container' style='flex-direction:column'>
+                    <div class='section-header'>Commands</div>
+                    <div class='list-view'>
+                    </div>
+                </div>
+            </div>
+            <div id='right' class='flex-container' style='flex-direction:column'>
+                <div id='input'>
+                </div>
+                <div id='output' class='flex-container' style='flex-direction:column'>
+                    <div id='channel-bar' class='flex-container tab-bar' style='flex-direction:row'>
+                        <div class='item'><span id='status'> output </span></div>
+                        <div class='item'><span id='status'> warnings </span></div>
+                        <div class='item'><span id='status'> errors </span></div>
+                    </div>
+                    <div id='channel-view'>
+                        blah!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
