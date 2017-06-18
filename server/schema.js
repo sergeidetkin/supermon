@@ -104,7 +104,8 @@ channels.monitor_test =
 channels.monitor =
 {
     log: {
-        name: "stdout",
+        name: "info",
+        history: 100
     },
     warnings: {
         name: "warnings"

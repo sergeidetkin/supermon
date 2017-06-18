@@ -27,14 +27,45 @@ const channels ={};
 
 class EventSource extends EventEmitter
 {
+    constructor(args) {
+        super();
+        this.cache = {};
+        const options = args || { history: 0 };
+        this.cache_max = options.history || 0;
+    }
+
     notify() {
         //console.log('notify', this.listenerCount(arguments[0]), 'listeners', arguments[1]);
+        if (0 < this.cache_max) {
+            const type = arguments[0];
+            if (undefined == this.cache[type]) {
+                this.cache[type] = [];
+            }
+            const history = this.cache[type];
+            history.push(arguments[1]);
+            if (history.length > this.cache_max) {
+                history.shift();
+            }
+        }
         this.emit.apply(this, arguments);
+    }
+
+    history(type) {
+        if (0 == this.cache_max) {
+            return [];
+        }
+        if (undefined == this.cache[type]) {
+            return [];
+        }
+        return this.cache[type];
     }
 
     subscribe(self, event, handler) {
         let f = handler.bind(self);
         self['on'+event] = f;
+        this.history(event).forEach((e) => {
+            f(e);
+        });
         this.on(event, f);
         //console.log('subscribed for', event);
     }
@@ -140,14 +171,15 @@ class ApiMessageHandler extends MessageHandler
 
         login.state = 'connected';
         //console.log(util.inspect(schema, false, null));
-        login.commands = schema.commands[login.name];
-        login.channels = schema.channels[login.name];
+        login.commands = schema.commands[login.name] || {};
+        login.channels = schema.channels[login.name] || {};
 
         if (!channels.hasOwnProperty(this.clientId)) {
             channels[this.clientId] = {};
-            let hub = channels[this.clientId];
+            const hub = channels[this.clientId];
             for (let topic in login.channels) {
-                hub[topic] = new EventSource();
+                //console.log(login.channels[topic].history);
+                hub[topic] = new EventSource({ history: login.channels[topic].history });
             }
         }
 

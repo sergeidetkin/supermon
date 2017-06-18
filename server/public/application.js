@@ -359,14 +359,14 @@ class Application
     }
 
     onupdate(message) {
-        console.debug('update', message);
+        //console.debug('update', message);
         var it = EventListViewItem.create();
         it.text = JSON.stringify(message);
         this.channelView.add(it);
     }
 
     onwarning(message) {
-        console.debug('warning', message);
+        //console.debug('warning', message);
         var id = message.source.name + '_' + message.source.instance;
         var element = this.processListView.element.querySelector('#'+id);
         var it = null;

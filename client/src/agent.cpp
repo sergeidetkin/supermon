@@ -111,13 +111,13 @@ namespace supermon
     void agent::listen()
     {
         auto streambuf = std::make_shared<boost::asio::streambuf>();
-        auto opcode = std::make_shared<beast::websocket::opcode>();
+        //auto opcode = std::make_shared<beast::websocket::opcode>();
 
         _websocket.async_read
         (
-            *opcode,
+            //*opcode,
             *streambuf,
-            [this, opcode, streambuf](const boost::system::error_code& error)
+            [this, /*opcode,*/ streambuf](const boost::system::error_code& error)
             {
                 if (error)
                 {
@@ -132,7 +132,7 @@ namespace supermon
                         default: throw std::runtime_error((std::to_string(error.value()) + ": " + error.message()).c_str());
                     }
                 }
-                else if (beast::websocket::opcode::text == *opcode)
+                else //if (beast::websocket::opcode::text == *opcode)
                 {
                     dispatch(streambuf);
                     streambuf->consume(streambuf->size()); // do we have to do this?

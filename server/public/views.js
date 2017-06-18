@@ -202,6 +202,7 @@ class ListView extends View
         item.element.itemIndex = this.element.childElementCount;
         this.element.appendChild(item.element);
         item.element.addEventListener('click', this.onItemClick.bind(this));
+        item.element.scrollIntoView();
     }
 
     clear() {
