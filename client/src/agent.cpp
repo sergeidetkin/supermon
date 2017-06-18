@@ -145,24 +145,29 @@ namespace supermon
     {
         boost::asio::streambuf buffer;
         std::ostream os(&buffer);
-
         boost::property_tree::write_json(os, message, indent);
-
         _websocket.write(buffer.data());
     }
     
-    void agent::send(const std::string& tag, const boost::property_tree::ptree& message, bool indent)
+    void agent::send(const std::string& tag, const boost::property_tree::ptree& message)
     {
         boost::property_tree::ptree msg;
         msg.put("push.channel", tag);
         msg.put_child("push.event", message);
-        send(msg, indent);
+        send(msg);
     }
 
     void agent::send(const std::string& tag, const std::string& message)
     {
         boost::property_tree::ptree msg;
-        msg.put(tag + ".message", message);
+        msg.put("text", message);
+        send(tag, msg);
+    }
+
+    void agent::alert(const std::string& text)
+    {
+        boost::property_tree::ptree msg;
+        msg.put("alert.text", text);
         send(msg);
     }
 

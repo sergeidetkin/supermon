@@ -203,12 +203,12 @@ div p {
     content: "online";
 }
 
-.warning > .lvi-label > .lvi-led {
+.alert > .lvi-label > .lvi-led {
     background-color: darkorange;
 }
 
-.warning > .lvi-label > .lvi-led::after {
-    content: "warning";
+.alert > .lvi-label > .lvi-led::after {
+    content: "alert";
 }
 
 .selected {

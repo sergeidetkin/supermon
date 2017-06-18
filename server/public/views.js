@@ -140,7 +140,7 @@ class ProcessListViewItem extends ListViewItem
         }
         else if (!flag && this.element.classList.contains('online')) {
             this.element.classList.remove('online');
-            this.warning = false;
+            this.alert = false;
         }
     }
 
@@ -148,17 +148,17 @@ class ProcessListViewItem extends ListViewItem
         return this.element.classList.contains('online');
     }
 
-    set warning(flag) {
-        if (flag && !this.element.classList.contains('warning')) {
-            this.element.classList.add('warning');
+    set alert(flag) {
+        if (flag && !this.element.classList.contains('alert')) {
+            this.element.classList.add('alert');
         }
-        else if (!flag && this.element.classList.contains('warning')) {
-            this.element.classList.remove('warning');
+        else if (!flag && this.element.classList.contains('alert')) {
+            this.element.classList.remove('alert');
         }
     }
 
-    get warning() {
-        return this.element.classList.contains('warning');
+    get alert() {
+        return this.element.classList.contains('alert');
     }
 
     set name(text) {
@@ -177,7 +177,8 @@ class ListView extends View
 {
     constructor(element) {
         super(element);
-        this.selectedIndex = -1;
+        this.maxCount = 0;
+        this._selectedIndex = -1;
         this.element.addEventListener('click', this.onClick.bind(this));
     }
 
@@ -199,6 +200,25 @@ class ListView extends View
     }
 
     add(item) {
+        if (0 < this.maxCount) {
+            var removedCount = 0;
+            while (this.count >= this.maxCount) {
+                if (0 == this.selectedIndex) {
+                    this.selectedIndex = -1;
+                }
+                else if (0 < this.selectedIndex) {
+                    --this._selectedIndex;
+                }
+                this.element.removeChild(this.element.firstElementChild);
+                ++removedCount;
+            }
+            if (removedCount > 0) {
+                var children = Array.from(this.element.children);
+                children.forEach(function adjustItemIndex(child) {
+                    child.itemIndex -= removedCount;
+                });
+            }
+        }
         item.element.itemIndex = this.element.childElementCount;
         this.element.appendChild(item.element);
         item.element.addEventListener('click', this.onItemClick.bind(this));

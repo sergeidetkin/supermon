@@ -43,11 +43,12 @@ int main(int argc, char* argv[])
             });
         };
 
-        agent.onconnect = [&io]()
+        agent.onconnect = [&io, &agent]()
         {
-            io.post([]()
+            io.post([&agent]()
             {
                 std::cout << std::this_thread::get_id() << ": connected :)" << std::endl;
+                agent.send("log", "hello!");
             });
         };
 
@@ -64,16 +65,17 @@ int main(int argc, char* argv[])
         {
             io.post([&io, &agent, tag, request]()
             {
-                //std::cout << std::this_thread::get_id() << ": tag=" << tag << ", message=";
-                //boost::property_tree::write_json(std::cout, *request, true);
-                boost::property_tree::ptree msg;
-                msg.put("text", "this is a test");
-                agent.send("log", msg);
-
-                agent.send("warning", "got '" + tag + "' message");
-
-                if ("shutdown" == tag) {
+                if ("send_alert" == tag) {
+                    std::string text = request->get<std::string>("text");
+                    agent.alert(text);
+                    agent.send("log", "raised alert '" + text + "'");
+                }
+                else if ("shutdown" == tag) {
+                    agent.send("warning", "shutting down...");
                     io.stop();
+                }
+                else {
+                    agent.send("error", "don't know what to do with '" + tag + "'");
                 }
             });
         };

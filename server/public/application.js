@@ -14,6 +14,13 @@
  along with Supermon.  If not, see http://www.gnu.org/licenses/
  */
 
+Date.prototype.strtime = function() {
+    return ('00' + this.getHours()).slice(-2) + ':'
+           + ('00' + this.getMinutes()).slice(-2) + ':'
+           + ('00' + this.getSeconds()).slice(-2) + '.'
+           + ('000' + this.getMilliseconds()).slice(-3);
+}
+
 class Application
 {
     constructor() {
@@ -29,6 +36,7 @@ class Application
         this.channelsListView.addEventListener('change', this.onSelectedChannelChanged.bind(this));
 
         this.channelView = new ListView(document.querySelector('#channel-view'));
+        this.channelView.maxCount = 100;
 
         this.reconnectTimeout = 3000; // ms
         this.reconnectAttemptsMax = Math.floor(60*1000 / this.reconnectTimeout);
@@ -123,7 +131,7 @@ class Application
                     option.value = value.value;
                     select.add(option);
                     if (0 == n && undefined == args[key]) {
-                        select.selectedIndex = 0; // because select makes the first item appera as selected, but does not change the selectedIndex
+                        select.selectedIndex = 0; // because select element makes the first item selected, but does not change the selectedIndex
                         args[key] = option.value;
                     }
                     if (args[key] == option.value) {
@@ -251,10 +259,10 @@ class Application
         it.online = online;
 
         if (online) {
-            it.info = (new Date(client.when)).toLocaleTimeString('en-GB') + ': logged in';
+            it.info = (new Date(client.when)).strtime() + ': logged in';
         }
         else {
-            it.info = (new Date(client.when)).toLocaleTimeString('en-GB') + ': (' + client.error.code + ') ' + client.error.reason;
+            it.info = (new Date(client.when)).strtime() + ': (' + client.error.code + ') ' + client.error.reason;
         }
 
     }
@@ -361,22 +369,21 @@ class Application
     onupdate(message) {
         //console.debug('update', message);
         var it = EventListViewItem.create();
-        it.text = JSON.stringify(message);
+        it.text = (new Date(message.when)).strtime() + ': ' + message.text;
         this.channelView.add(it);
     }
 
-    onwarning(message) {
-        //console.debug('warning', message);
+    onalert(message) {
         var id = message.source.name + '_' + message.source.instance;
         var element = this.processListView.element.querySelector('#'+id);
         var it = null;
         if (null != element) {
             it = new ProcessListViewItem(element);
-            it.warning = true;
-            it.info = (new Date(message.when)).toLocaleTimeString('en-GB') + ': ' + message.message;
+            it.alert = true;
+            it.info = (new Date(message.when)).strtime() + ': ' + message.text;
         }
         if (null == it) {
-            console.error('onwarning() failed: list view item with id "', '#'+id, '" not found');
+            console.error('onalert() failed: list view item with id "', '#'+id, '" not found');
         }
     }
 

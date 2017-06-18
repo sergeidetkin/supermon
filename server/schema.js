@@ -60,16 +60,25 @@ commands.monitor =
 {
     ping: {
         name: "ping process",
-        description: "Ping selected process",
+        description: "Ping the process",
         parameters: {
             user: {
                 name: "User"
             }
         }
     },
+    send_alert: {
+        name: "raise alert",
+        description: "Raise alert",
+        parameters: {
+            text: {
+                name: "Text"
+            }
+        }
+    },
     shutdown: {
         name: "shutdown process",
-        description: "Send shutdown notification to the selected process",
+        description: "Send shutdown request",
         parameters: {
             user: {
                 name: "User"
@@ -93,10 +102,10 @@ channels.monitor_test =
     log: {
         name: "log messages",
     },
-    warnings: {
+    warning: {
         name: "warnings"
     },
-    errors: {
+    error: {
         name: "errors"
     }
 };
@@ -105,13 +114,15 @@ channels.monitor =
 {
     log: {
         name: "info",
+        history: 10
+    },
+    warning: {
+        name: "warnings",
+        history: 50
+    },
+    error: {
+        name: "errors",
         history: 100
-    },
-    warnings: {
-        name: "warnings"
-    },
-    errors: {
-        name: "errors"
     }
 };
 

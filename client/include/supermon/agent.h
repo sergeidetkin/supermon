@@ -51,15 +51,16 @@ namespace supermon
         void shutdown();
 
     public:
-        void send(const boost::property_tree::ptree&, bool indent = false);
-        void send(const std::string& tag, const boost::property_tree::ptree&, bool indent = false);
+        void send(const std::string& tag, const boost::property_tree::ptree&);
         void send(const std::string& tag, const std::string& message);
+        void alert(const std::string& text);
 
     protected:
         void init();
         void listen();
         void retry(std::chrono::seconds timeout = std::chrono::seconds(5));
         void dispatch(const std::shared_ptr<boost::asio::streambuf>&);
+        void send(const boost::property_tree::ptree&, bool indent = false);
 
     public:
         std::function<void (std::exception_ptr)>                           onabort = [](std::exception_ptr){};

@@ -42,10 +42,10 @@ class EventSource extends EventEmitter
                 this.cache[type] = [];
             }
             const history = this.cache[type];
-            history.push(arguments[1]);
-            if (history.length > this.cache_max) {
+            while (history.length >= this.cache_max) {
                 history.shift();
             }
+            history.push(arguments[1]);
         }
         this.emit.apply(this, arguments);
     }
@@ -140,7 +140,7 @@ class ApiMessageHandler extends MessageHandler
 
     onclose(socket, code, reason) {
         const client = clients[this.clientId];
-        //client.when = Date.now();
+        client.when = Date.now();
 
         client.state = 'disconnected';
         client.error = { code: code, reason: reason || 'killed' };
@@ -164,7 +164,7 @@ class ApiMessageHandler extends MessageHandler
 
     onlogin(message) {
         const login = message;
-        //login.when = Date.now();
+        login.when = Date.now();
 
         this.clientId = login.name + '.' + login.instance;
         clients[this.clientId] = login;
@@ -194,14 +194,16 @@ class ApiMessageHandler extends MessageHandler
             message.event.when = message.when;
             channel.notify('update', message.event);
         }
+        else {
+            console.log('Failed to dispatch push notification from', this.clientId, ':', JSON.stringify(message));
+        }
     }
 
-    onwarning(message) {
+    onalert(message) {
         const client = clients[this.clientId];
-        const warning = message;
-        //warning.when = Date.now();
-        warning.source = { name: client.name, instance: client.instance };
-        user.notify('warning', message);
+        const alert = message;
+        alert.source = { name: client.name, instance: client.instance };
+        user.notify('alert', message);
     }
 
     oncommand(event) {
@@ -225,8 +227,8 @@ class UserMessageHandler extends MessageHandler
         this.topic = null;
 
         user.subscribe(this, 'login', this.onlogin);
+        user.subscribe(this, 'alert', this.onalert);
         user.subscribe(this, 'disconnect', this.ondisconnect);
-        user.subscribe(this, 'warning', this.onwarning);
 
         const message = { "clients" : clients };
         this.send(message);
@@ -275,8 +277,8 @@ class UserMessageHandler extends MessageHandler
         api.notify('command', event);
     }
 
-    onwarning(event) {
-        const message = { warning: event };
+    onalert(event) {
+        const message = { alert: event };
         this.send(message);
     }
 
@@ -284,7 +286,7 @@ class UserMessageHandler extends MessageHandler
         this.onunsubscribe();
         user.unsubscribe('login', this.onlogin);
         user.unsubscribe('disconnect', this.ondisconnect);
-        user.unsubscribe('warning', this.onwarning);
+        user.unsubscribe('alert', this.onalert);
         super.finalize();
     }
 
