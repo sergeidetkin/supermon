@@ -35,7 +35,6 @@ class EventSource extends EventEmitter
     }
 
     notify() {
-        //console.log('notify', this.listenerCount(arguments[0]), 'listeners', arguments[1]);
         if (0 < this.cache_max) {
             const type = arguments[0];
             if (undefined == this.cache[type]) {
@@ -60,19 +59,17 @@ class EventSource extends EventEmitter
         return this.cache[type];
     }
 
-    subscribe(self, event, handler) {
-        let f = handler.bind(self);
-        self['on'+event] = f;
+    subscribe(target, event, handler) {
+        let f = handler.bind(target);
+        target['on'+event] = f;
         this.history(event).forEach((e) => {
             f(e);
         });
         this.on(event, f);
-        //console.log('subscribed for', event);
     }
 
     unsubscribe(event, handler) {
         this.removeListener(event, handler);
-        //console.log('unsubscribed from', event);
     }
 }
 
@@ -103,6 +100,7 @@ class MessageHandler
             const message = JSON.parse(buffer);
             const id = Object.keys(message)[0];
             if ('function' == typeof(this['on'+id])) {
+                // timestamp the incoming message
                 message[id].when = Date.now();
                 this['on'+id](message[id]);
             }
@@ -140,15 +138,21 @@ class ApiMessageHandler extends MessageHandler
 
     onclose(socket, code, reason) {
         const client = clients[this.clientId];
-        client.when = Date.now();
 
-        client.state = 'disconnected';
-        client.error = { code: code, reason: reason || 'killed' };
+        client.status = {
+            type: 'offline',
+            when: Date.now(),
+            text: reason || 'disconnected'
+        };
 
-        user.notify('disconnect', client);
+        const event = {
+            source: {
+                name: client.name,
+                instance: client.instance
+            }
+        };
 
-        //delete clients[this.clientId];
-        //console.log(clients);
+        user.notify('status', event);
 
         super.onclose(socket, code, reason);
     }
@@ -164,13 +168,10 @@ class ApiMessageHandler extends MessageHandler
 
     onlogin(message) {
         const login = message;
-        login.when = Date.now();
 
         this.clientId = login.name + '.' + login.instance;
         clients[this.clientId] = login;
 
-        login.state = 'connected';
-        //console.log(util.inspect(schema, false, null));
         login.commands = schema.commands[login.name] || {};
         login.channels = schema.channels[login.name] || {};
 
@@ -183,27 +184,46 @@ class ApiMessageHandler extends MessageHandler
             }
         }
 
-        user.notify('login', message);
+        login.status = {
+            type: 'info',
+            text: 'connected',
+            when: parseInt(message.timestamp)
+        };
 
-        //this.ping();
+        user.notify('login', message);
     }
 
     onpush(message) {
         const channel = channels[this.clientId][message.channel];
         if (channel) {
-            message.event.when = message.when;
-            channel.notify('update', message.event);
+            const client = clients[this.clientId];
+
+            channel.notify('update', {
+                channel: message.channel,
+                event: message.event,
+                source: {
+                    name: client.name,
+                    instance: client.instance
+                },
+                when: message.when
+            });
         }
         else {
             console.log('Failed to dispatch push notification from', this.clientId, ':', JSON.stringify(message));
         }
     }
 
-    onalert(message) {
+    onstatus(message) {
         const client = clients[this.clientId];
-        const alert = message;
-        alert.source = { name: client.name, instance: client.instance };
-        user.notify('alert', message);
+        client.status = message;
+
+        user.notify('status', {
+            status: message.status,
+            source: {
+                name: client.name, 
+                instance: client.instance 
+            }
+        });
     }
 
     oncommand(event) {
@@ -227,10 +247,9 @@ class UserMessageHandler extends MessageHandler
         this.topic = null;
 
         user.subscribe(this, 'login', this.onlogin);
-        user.subscribe(this, 'alert', this.onalert);
-        user.subscribe(this, 'disconnect', this.ondisconnect);
+        user.subscribe(this, 'status', this.onstatus);
 
-        const message = { "clients" : clients };
+        const message = { "snapshot" : clients };
         this.send(message);
     }
 
@@ -268,25 +287,35 @@ class UserMessageHandler extends MessageHandler
         this.send(message);
     }
 
-    ondisconnect(event) {
-        const message = { disconnect: event };
-        this.send(message);
-    }
-
     oncommand(event) {
         api.notify('command', event);
     }
 
-    onalert(event) {
-        const message = { alert: event };
+    onstatus(event) {
+        const client = clients[event.source.name + '.' + event.source.instance];
+        if (undefined == client) {
+            console.log('failed to locate the source for:', JSON.stringify(event));
+            return;
+        }
+
+        const message = {
+            status: {
+                status: client.status,
+                source: event.source
+            }
+        };
+        this.send(message);
+    }
+
+    oninfo(event) {
+        const message = { info: event };
         this.send(message);
     }
 
     finalize() {
         this.onunsubscribe();
         user.unsubscribe('login', this.onlogin);
-        user.unsubscribe('disconnect', this.ondisconnect);
-        user.unsubscribe('alert', this.onalert);
+        user.unsubscribe('status', this.onstatus);
         super.finalize();
     }
 

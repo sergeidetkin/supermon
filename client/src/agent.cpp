@@ -167,7 +167,16 @@ namespace supermon
     void agent::alert(const std::string& text)
     {
         boost::property_tree::ptree msg;
-        msg.put("alert.text", text);
+        msg.put("status.type", "alert");
+        msg.put("status.text", text);
+        send(msg);
+    }
+
+    void agent::info(const std::string& text)
+    {
+        boost::property_tree::ptree msg;
+        msg.put("status.type", "info");
+        msg.put("status.text", text);
         send(msg);
     }
 
@@ -192,6 +201,7 @@ namespace supermon
                     login.put("login.name", name);
                     login.put("login.instance", _config.instance);
                     login.put("login.pid", boost::this_process::get_id());
+                    login.put("login.timestamp", std::chrono::duration_cast<std::chrono::milliseconds>(_when.time_since_epoch()).count());
 
                     send(login);
                     

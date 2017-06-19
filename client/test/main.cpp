@@ -68,13 +68,14 @@ int main(int argc, char* argv[])
                 if ("send_alert" == tag) {
                     std::string text = request->get<std::string>("text");
                     agent.alert(text);
-                    agent.send("log", "raised alert '" + text + "'");
+                    agent.send("warning", "raised alert '" + text + "'");
                 }
                 else if ("shutdown" == tag) {
                     agent.send("warning", "shutting down...");
                     io.stop();
                 }
                 else {
+                    agent.info(tag);
                     agent.send("error", "don't know what to do with '" + tag + "'");
                 }
             });

@@ -21,6 +21,7 @@
 #include <string>
 #include <memory>
 #include <future>
+#include <chrono>
 
 #include "boost/asio.hpp"
 #include "boost/asio/system_timer.hpp"
@@ -54,6 +55,7 @@ namespace supermon
         void send(const std::string& tag, const boost::property_tree::ptree&);
         void send(const std::string& tag, const std::string& message);
         void alert(const std::string& text);
+        void info(const std::string& text);
 
     protected:
         void init();
@@ -78,6 +80,7 @@ namespace supermon
         boost::asio::system_timer                               _timer;
         boost::asio::ip::tcp::socket                            _socket;
         beast::websocket::stream<boost::asio::ip::tcp::socket&> _websocket;
+        std::chrono::time_point<std::chrono::system_clock>      _when = std::chrono::system_clock::now();
     };
 
 }

@@ -227,10 +227,23 @@ class Application
         this.updateChannelsView(id);
     }
 
+    updateClientStatus(client) {
+        var id = client.name + '_' + client.instance;
+        var element = this.processListView.element.querySelector('#'+id);
+        var it = null;
+        if (null != element) {
+            it = new ProcessListViewItem(element);
+            it.alert = 'alert' == client.status.type;
+            it.online = 'offline' != client.status.type;
+            it.info = (new Date(client.status.when)).strtime() + ': ' + client.status.text;
+        }
+        if (null == it) {
+            console.error('onstatus() failed: list view item with id "', '#'+id, '" not found');
+        }
+    }
+
     updateClientItem(client) {
         var id = client.name + '_' + client.instance;
-        var online = 'connected' == client.state;
-
         var it = null;
 
         if (undefined == this.clients[id]) {
@@ -256,15 +269,8 @@ class Application
         }
 
         it.name = client.name + '.' + client.instance + '.' + client.pid;
-        it.online = online;
 
-        if (online) {
-            it.info = (new Date(client.when)).strtime() + ': logged in';
-        }
-        else {
-            it.info = (new Date(client.when)).strtime() + ': (' + client.error.code + ') ' + client.error.reason;
-        }
-
+        this.updateClientStatus(client);
     }
 
     updateStatusBar() {
@@ -284,7 +290,7 @@ class Application
 
         for (var id in this.clients) {
             ++total;
-            if ('connected' == this.clients[id].state) {
+            if ('offline' != this.clients[id].status.type) {
                 ++connected;
             }
         }
@@ -350,18 +356,15 @@ class Application
         this.updateStatusBar();
     }
 
-    onclients(message) {
-        console.debug('clients', message);
-
+    onsnapshot(message) {
         for (var id in message) {
             this.updateClientItem(message[id]);
         }
-
         this.updateStatusBar();
     }
 
     onlogin(message) {
-        console.debug('login', message);
+        //console.debug('login', message);
         this.updateClientItem(message);
         this.updateStatusBar();
     }
@@ -369,30 +372,21 @@ class Application
     onupdate(message) {
         //console.debug('update', message);
         var it = EventListViewItem.create();
-        it.text = (new Date(message.when)).strtime() + ': ' + message.text;
+        it.text = (new Date(message.when)).strtime() + ': ' + message.event.text;
         this.channelView.add(it);
     }
 
-    onalert(message) {
+    onstatus(message) {
         var id = message.source.name + '_' + message.source.instance;
-        var element = this.processListView.element.querySelector('#'+id);
-        var it = null;
-        if (null != element) {
-            it = new ProcessListViewItem(element);
-            it.alert = true;
-            it.info = (new Date(message.when)).strtime() + ': ' + message.text;
+        var client = this.clients[id];
+        if (undefined == client) {
+            console.error('onstatus() failed: client not found', message.source);
+            return;
         }
-        if (null == it) {
-            console.error('onalert() failed: list view item with id "', '#'+id, '" not found');
-        }
-    }
-
-    ondisconnect(message) {
-        console.debug('disconnect', message);
-        this.updateClientItem(message);
+        client.status = message.status;
+        this.updateClientStatus(client);
         this.updateStatusBar();
     }
-
 }
 
 window.addEventListener('load', function main() {

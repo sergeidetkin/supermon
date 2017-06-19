@@ -1,5 +1,5 @@
-VPATH := ../src
-SOURCES := main.cpp agent.cpp
+VPATH := ..
+SOURCES := main.cpp src/agent.cpp
 TARGET := monitor_test
 
 build ?= $(if $(debug),debug,release)
