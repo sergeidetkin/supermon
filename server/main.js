@@ -186,7 +186,7 @@ class ApiMessageHandler extends MessageHandler
 
         login.status = {
             type: 'info',
-            text: 'connected',
+            text: 'started',
             when: parseInt(message.timestamp)
         };
 
@@ -304,11 +304,6 @@ class UserMessageHandler extends MessageHandler
                 source: event.source
             }
         };
-        this.send(message);
-    }
-
-    oninfo(event) {
-        const message = { info: event };
         this.send(message);
     }
 

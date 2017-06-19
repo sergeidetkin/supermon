@@ -97,18 +97,6 @@ commands.monitor =
 
 var channels = {};
 
-channels.monitor_test =
-{
-    log: {
-        name: "log messages",
-    },
-    warning: {
-        name: "warnings"
-    },
-    error: {
-        name: "errors"
-    }
-};
 
 channels.monitor =
 {
@@ -125,6 +113,8 @@ channels.monitor =
         history: 100
     }
 };
+
+channels.monitor_test = channels.monitor;
 
 exports.commands = commands;
 exports.channels = channels;

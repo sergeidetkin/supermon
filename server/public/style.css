@@ -196,7 +196,7 @@ div p {
 }
 
 .online > .lvi-label > .lvi-led {
-    background-color: #00cc00;
+    background-color: #0C0;
 }
 
 .online > .lvi-label > .lvi-led::after {

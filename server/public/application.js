@@ -274,7 +274,7 @@ class Application
     }
 
     updateStatusBar() {
-        var bg = this.online ? '#00cc00' : 'crimson';
+        var bg = this.online ? '#0C0' : 'crimson';
         //var fg = this.online ? 'rgb(80,80,80)' : 'white';
         var fg = 'white';
         var status = document.querySelector('#status-bar > .item > #status');
