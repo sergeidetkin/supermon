@@ -21,6 +21,10 @@ Date.prototype.strtime = function() {
            + ('000' + this.getMilliseconds()).slice(-3);
 }
 
+function identify(client) {
+    return (client.name + '-' + client.instance).replace(/\W/g, '-');
+}
+
 class Application
 {
     constructor() {
@@ -228,7 +232,7 @@ class Application
     }
 
     updateClientStatus(client) {
-        var id = client.name + '_' + client.instance;
+        var id = identify(client);
         var element = this.processListView.element.querySelector('#'+id);
         var it = null;
         if (null != element) {
@@ -243,7 +247,7 @@ class Application
     }
 
     updateClientItem(client) {
-        var id = client.name + '_' + client.instance;
+        var id = identify(client);
         var it = null;
 
         if (undefined == this.clients[id]) {
@@ -377,7 +381,7 @@ class Application
     }
 
     onstatus(message) {
-        var id = message.source.name + '_' + message.source.instance;
+        var id = identify(message.source);
         var client = this.clients[id];
         if (undefined == client) {
             console.error('onstatus() failed: client not found', message.source);

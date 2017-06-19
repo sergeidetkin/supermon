@@ -157,15 +157,6 @@ class ApiMessageHandler extends MessageHandler
         super.onclose(socket, code, reason);
     }
 
-    ping() {
-        if (this.connected) {
-            this.send('hello!');
-            setTimeout(() => {
-                this.ping();
-            }, 3000);
-        }
-    }
-
     onlogin(message) {
         const login = message;
 
@@ -276,6 +267,10 @@ class UserMessageHandler extends MessageHandler
         }
     }
 
+    oncommand(message) {
+        api.notify('command', message);
+    }
+
     onupdate(event) {
         //console.log(JSON.stringify(event));
         const message = { update: event };
@@ -285,10 +280,6 @@ class UserMessageHandler extends MessageHandler
     onlogin(event) {
         const message = { login: event };
         this.send(message);
-    }
-
-    oncommand(event) {
-        api.notify('command', event);
     }
 
     onstatus(event) {
