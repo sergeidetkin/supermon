@@ -21,6 +21,7 @@ const WebSocket = require('ws');
 const EventEmitter = require('events');
 const schema = require('./schema');
 const util = require('util');
+const config = require('./config');
 
 const clients = {};
 const channels ={};
@@ -59,6 +60,7 @@ class EventSource extends EventEmitter
         return this.cache[type];
     }
 
+    // need this to be able get the stable handler reference to unsubscribe later
     subscribe(target, event, handler) {
         let f = handler.bind(target);
         target['on'+event] = f;
@@ -311,7 +313,6 @@ var application = new class Application
 {
     constructor() {
 
-
         this.httpServer = HTTP.createServer((request, response) => {
             this.onHttpRequest(request, response);
         });
@@ -322,7 +323,7 @@ var application = new class Application
             this.onWebSocketConnect(socket, request);
         });
 
-        this.httpServer.listen(8080, () => {
+        this.httpServer.listen(config.http.port, () => {
             console.log('HTTP server listening on port %d', this.httpServer.address().port);
         });
 

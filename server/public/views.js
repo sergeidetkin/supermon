@@ -42,15 +42,15 @@ class ListViewItem extends View
 
 class EventListViewItem extends ListViewItem
 {
-    constructor(element) {
-        super(element);
-    }
-
-    static create() {
-        var element = document.createElement('div');
-        element.classList.add('lv-item');
-
-        return new EventListViewItem(element);
+    constructor() {
+        if (0 < arguments.length) {
+            super(arguments[0]);
+        }
+        else {
+            var element = document.createElement('div');
+            element.classList.add('lv-item');
+            super(element);
+        }
     }
 
     set text(str) {
@@ -64,15 +64,15 @@ class EventListViewItem extends ListViewItem
 
 class CommandListViewItem extends ListViewItem
 {
-    constructor(element) {
-        super(element);
-    }
-
-    static create() {
-        var element = document.createElement('div');
-        element.classList.add('lv-item');
-
-        return new CommandListViewItem(element);
+    constructor() {
+        if (0 < arguments.length) {
+            super(arguments[0]);
+        }
+        else {
+            var element = document.createElement('div');
+            element.classList.add('lv-item');
+            super(element);
+        }
     }
 
     bind(commandId, target) {
@@ -86,15 +86,15 @@ class CommandListViewItem extends ListViewItem
 
 class ChannelsListViewItem extends ListViewItem
 {
-    constructor(element) {
-        super(element);
-    }
-
-    static create() {
-        var element = document.createElement('div');
-        element.classList.add('item');
-
-        return new ChannelsListViewItem(element);
+    constructor() {
+        if (0 < arguments.length) {
+            super(arguments[0]);
+        }
+        else {
+            var element = document.createElement('div');
+            element.classList.add('item');
+            super(element);
+        }
     }
 
     bind(key, client) {
@@ -107,31 +107,32 @@ class ChannelsListViewItem extends ListViewItem
 
 class ProcessListViewItem extends ListViewItem
 {
-    constructor(element) {
-        super(element);
-    }
+    constructor() {
+        if (0 < arguments.length) {
+            super(arguments[0]);
+        }
+        else {
+            var element = document.createElement('div');
+            element.classList.add('lv-item');
 
-    static create() {
-        var element = document.createElement('div');
-        element.classList.add('lv-item');
+            var label = document.createElement('div');
+            label.classList.add('lvi-label');
+            element.appendChild(label);
 
-        var label = document.createElement('div');
-        label.classList.add('lvi-label');
-        element.appendChild(label);
+            var led = document.createElement('span');
+            led.classList.add('lvi-led');
+            label.appendChild(led);
 
-        var led = document.createElement('span');
-        led.classList.add('lvi-led');
-        label.appendChild(led);
+            var caption = document.createElement('span');
+            caption.classList.add('lvi-caption');
+            label.appendChild(caption);
 
-        var caption = document.createElement('span');
-        caption.classList.add('lvi-caption');
-        label.appendChild(caption);
+            var info = document.createElement('div');
+            info.classList.add('lvi-info');
+            element.appendChild(info);
 
-        var info = document.createElement('div');
-        info.classList.add('lvi-info');
-        element.appendChild(info);
-
-        return new ProcessListViewItem(element);
+            super(element);
+        }
     }
 
     set online(flag) {
@@ -214,7 +215,7 @@ class ListView extends View
             }
             if (removedCount > 0) {
                 var children = Array.from(this.element.children);
-                children.forEach(function adjustItemIndex(child) {
+                children.forEach(function(child) {
                     child.itemIndex -= removedCount;
                 });
             }
@@ -222,7 +223,9 @@ class ListView extends View
         item.element.itemIndex = this.element.childElementCount;
         this.element.appendChild(item.element);
         item.element.addEventListener('click', this.onItemClick.bind(this));
-        item.element.scrollIntoView();
+        if (-1 == this.selectedIndex) {
+            item.element.scrollIntoView({behavior: 'instant'});
+        }
     }
 
     clear() {

@@ -71,7 +71,7 @@ class Application
         if (client.hasOwnProperty('channels')) {
             for (var key in client.channels) {
                 //var command = client.commands[key];
-                var it = ChannelsListViewItem.create();
+                var it = new ChannelsListViewItem();
                 it.bind(key, client);
                 this.channelsListView.add(it);
             }
@@ -87,7 +87,7 @@ class Application
         if (client.hasOwnProperty('commands')) {
             for (var key in client.commands) {
                 //var command = client.commands[key];
-                var it = CommandListViewItem.create();
+                var it = new CommandListViewItem();
                 it.bind(key, client);
                 this.commandsListView.add(it);
             }
@@ -116,7 +116,7 @@ class Application
                 input.type = 'text';
                 input.value = args[key] || '';
                 cell.appendChild(input);
-                // careful, we are creating a generator function to properly capture args, key and input
+                // need this to properly capture args, key and input
                 input.addEventListener('input',
                     (function(args, key, input) {
                         return function() {
@@ -135,7 +135,8 @@ class Application
                     option.value = value.value;
                     select.add(option);
                     if (0 == n && undefined == args[key]) {
-                        select.selectedIndex = 0; // because select element makes the first item selected, but does not change the selectedIndex
+                        // because select element makes the first item selected, but does not change the selectedIndex
+                        select.selectedIndex = 0;
                         args[key] = option.value;
                     }
                     if (args[key] == option.value) {
@@ -253,7 +254,7 @@ class Application
         if (undefined == this.clients[id]) {
             this.clients[id] = client;
 
-            it = ProcessListViewItem.create();
+            it = new ProcessListViewItem();
             it.element.id = id;
 
             this.processListView.add(it);
@@ -375,7 +376,7 @@ class Application
 
     onupdate(message) {
         //console.debug('update', message);
-        var it = EventListViewItem.create();
+        var it = new EventListViewItem();
         it.text = (new Date(message.when)).strtime() + ': ' + message.event.text;
         this.channelView.add(it);
     }
