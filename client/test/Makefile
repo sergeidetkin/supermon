@@ -9,7 +9,7 @@ boost.dir := $(HOME)/src/boost-1.65
 boost.dir.include := $(boost.dir)
 boost.dir.lib := $(boost.dir)/bin.v2/libs
 
-boost.libs := system
+boost.libs := program_options system
 
 beast.dir := $(HOME)/src/Beast
 beast.dir.include := $(beast.dir)/include

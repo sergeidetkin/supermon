@@ -20,6 +20,7 @@
 #include <thread>
 
 #include "boost/property_tree/json_parser.hpp"
+#include "boost/program_options.hpp"
 
 #include "supermon/agent.h"
 
@@ -27,20 +28,37 @@ int main(int argc, char* argv[])
 {
     try
     {
+        namespace config = boost::program_options;
+        config::options_description options("options");
+        options.add_options()
+            ("help",     "print this message")
+            ("alias",    config::value<std::string>(), "use 'alias' instead of the executable's name")
+            ("instance", config::value<std::string>(), "set the process instance")
+            ("host",     config::value<std::string>()->default_value("localhost"), "supermon server host")
+            ("port",     config::value<std::uint16_t>()->default_value(8080), "supermon server port");
+
+        config::variables_map arguments;
+        config::store(config::parse_command_line(argc, argv, options), arguments);
+        config::notify(arguments);
+
+        if (arguments.count("help"))
+        {
+            std::cout << options << std::endl;
+            return EXIT_FAILURE;
+        }
+
         std::cerr << std::this_thread::get_id() << ": started..." << std::endl;
 
         boost::asio::io_service io;
         boost::asio::io_service::work work(io);
 
         supermon::agent agent
-        (
-            {
-                1 < argc ? argv[1] : argv[0],
-                2 < argc ? argv[2] : "abc",
-                "localhost",
-                8080
-            }
-         );
+        ({
+            arguments.count("alias") ? arguments["alias"].as<std::string>() : argv[0],
+            arguments.count("instance") ? arguments["instance"].as<std::string>() : "A1",
+            arguments["host"].as<std::string>(),
+            arguments["port"].as<std::uint16_t>()
+        });
 
         agent.onerror = [&io](const std::exception& error)
         {

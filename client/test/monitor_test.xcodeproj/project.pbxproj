@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		223F07BD1EFA041A00DAE156 /* libboost_program_options.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 223F07BC1EFA041A00DAE156 /* libboost_program_options.a */; };
 		224ED42B1EF39A7300D926C4 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 224ED42A1EF39A7300D926C4 /* main.cpp */; };
 		2276DB911EF3A7BA00A48F47 /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2276DB901EF3A7BA00A48F47 /* libboost_system.a */; };
 		228F0B3F1EF4DFC400E90748 /* agent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 228F0B3E1EF4DFC400E90748 /* agent.cpp */; };
@@ -25,6 +26,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		223F07BC1EFA041A00DAE156 /* libboost_program_options.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_program_options.a; path = "../../../boost-1.65/bin.v2/libs/program_options/build/darwin-4.2.1/release/link-static/threading-multi/libboost_program_options.a"; sourceTree = "<group>"; };
 		224ED4201EF398D100D926C4 /* monitor_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = monitor_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		224ED42A1EF39A7300D926C4 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = main.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		2276DB901EF3A7BA00A48F47 /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = "../../../boost-1.65/bin.v2/libs/system/build/darwin-4.2.1/release/link-static/threading-multi/libboost_system.a"; sourceTree = "<group>"; };
@@ -37,6 +39,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				223F07BD1EFA041A00DAE156 /* libboost_program_options.a in Frameworks */,
 				2276DB911EF3A7BA00A48F47 /* libboost_system.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -65,6 +68,7 @@
 		2276DB951EF3A85C00A48F47 /* libs */ = {
 			isa = PBXGroup;
 			children = (
+				223F07BC1EFA041A00DAE156 /* libboost_program_options.a */,
 				2276DB901EF3A7BA00A48F47 /* libboost_system.a */,
 			);
 			name = libs;
@@ -252,6 +256,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(BOOST_DIR)/bin.v2/libs",
+					"/Users/superuser/src/boost-1.65/bin.v2/libs/program_options/build/darwin-4.2.1/release/link-static/threading-multi",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -270,6 +275,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(BOOST_DIR)/bin.v2/libs",
+					"/Users/superuser/src/boost-1.65/bin.v2/libs/program_options/build/darwin-4.2.1/release/link-static/threading-multi",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
