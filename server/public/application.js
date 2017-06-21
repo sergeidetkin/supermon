@@ -199,6 +199,7 @@ class Application
     }
 
     onSelectedCommandChanged(e) {
+        var input = document.querySelector('#input');
         var status = document.querySelector('#status-bar > .item > #command');
         var commandId = null;
         var target = null;
@@ -207,10 +208,12 @@ class Application
             target = this.commandsListView.element.children[e.selectedIndex].target;
             status.textContent = target.commands[commandId].name;
             status.parentElement.style.display = '';
+            input.style.display = '';
         }
         else {
             status.textContent = '';
             status.parentElement.style.display = 'none';
+            input.style.display = 'none';
         }
         this.updateInputView(commandId, target);
     }
@@ -376,9 +379,21 @@ class Application
 
     onupdate(message) {
         //console.debug('update', message);
-        var it = new EventListViewItem();
-        it.text = (new Date(message.when)).strtime() + ': ' + message.event.text;
-        this.channelView.add(it);
+        if (Array.isArray(message)) {
+            this.channelView.autoScroll = false;
+            for (var n = 0; n < message.length; ++n) {
+                var item = message[n];
+                var it = new EventListViewItem();
+                it.text = (new Date(item.when)).strtime() + ': ' + item.event.text;
+                this.channelView.add(it);
+            }
+            this.channelView.autoScroll = true;
+        }
+        else {
+            var it = new EventListViewItem();
+            it.text = (new Date(message.when)).strtime() + ': ' + message.event.text;
+            this.channelView.add(it);
+        }
     }
 
     onstatus(message) {

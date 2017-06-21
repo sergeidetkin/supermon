@@ -112,7 +112,24 @@ int main(int argc, char* argv[])
         };
 
         agent.connect();
+/*
+        boost::asio::system_timer timer(io);
 
+        std::function<void(const boost::system::error_code&)> tick = [&timer, &agent, &tick](const boost::system::error_code& error)
+        {
+            if (error != boost::asio::error::operation_aborted)
+            {
+                auto ticks = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+                agent.send("log", "the time now is: " + std::to_string(ticks));
+
+                timer.expires_from_now(std::chrono::milliseconds(50));
+                timer.async_wait(tick);
+            }
+        };
+
+        timer.expires_from_now(std::chrono::milliseconds(50));
+        timer.async_wait(tick);
+*/
         io.run();
 
         std::cerr << std::this_thread::get_id() << ": done." << std::endl;

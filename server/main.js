@@ -64,9 +64,13 @@ class EventSource extends EventEmitter
     subscribe(target, event, handler) {
         let f = handler.bind(target);
         target['on'+event] = f;
-        this.history(event).forEach((e) => {
-            f(e);
-        });
+//        this.history(event).forEach((e) => {
+//            f(e);
+//        });
+        const hist = this.history(event);
+        if (0 < hist.length) {
+            f(this.history(event));
+        }
         this.on(event, f);
     }
 
@@ -274,7 +278,6 @@ class UserMessageHandler extends MessageHandler
     }
 
     onupdate(event) {
-        //console.log(JSON.stringify(event));
         const message = { update: event };
         this.send(message);
     }

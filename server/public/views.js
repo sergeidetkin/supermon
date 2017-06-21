@@ -180,6 +180,7 @@ class ListView extends View
         super(element);
         this.maxCount = 0;
         this._selectedIndex = -1;
+        this.autoScroll = true;
         this.element.addEventListener('click', this.onClick.bind(this));
     }
 
@@ -223,7 +224,7 @@ class ListView extends View
         item.element.itemIndex = this.element.childElementCount;
         this.element.appendChild(item.element);
         item.element.addEventListener('click', this.onItemClick.bind(this));
-        if (-1 == this.selectedIndex) {
+        if (-1 == this.selectedIndex && this.autoScroll) {
             item.element.scrollIntoView({behavior: 'instant'});
         }
     }

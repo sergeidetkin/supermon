@@ -102,11 +102,11 @@ channels.monitor =
 {
     log: {
         name: "info",
-        history: 10
+        history: 98
     },
     warning: {
         name: "warnings",
-        history: 50
+        history: 99
     },
     error: {
         name: "errors",

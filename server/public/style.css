@@ -151,7 +151,12 @@ div p {
 }
 
 .lv-item:nth-child(even) {
-    background-color: #EEE;
+    /*background-color: #EEE;*/
+}
+
+#channel-view > .lv-item{
+    font-size: 10pt;
+    font-family: 'Consolas';
 }
 
 .lvi-label {
