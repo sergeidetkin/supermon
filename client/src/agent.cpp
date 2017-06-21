@@ -46,6 +46,27 @@ namespace supermon
 
     void agent::init()
     {
+        if (_config.name.empty() || _config.instance.empty() || _config.host.empty() || _config.port < 80)
+        {
+            throw std::invalid_argument("invalid config");
+        }
+
+        onabort = [](std::exception_ptr eptr)
+        {
+            try
+            {
+                std::rethrow_exception(eptr);
+            }
+            catch (const std::exception& e)
+            {
+                std::cerr << "supermon::agent: unhandled exception: " << e.what() << std::endl;
+            }
+            catch (...)
+            {
+                std::cerr << "supermon::agent: unhandled exception" << std::endl;
+            }
+        };
+
         _work = std::make_shared<boost::asio::io_service::work>(_io);
         _result = std::async(std::launch::async, [this]()
         {
@@ -54,11 +75,29 @@ namespace supermon
                 try
                 {
                     _io.run();
+                    break; // exit normally
+                }
+                catch (const std::exception& e)
+                {
+                    // if there is a handler for soft error call it and continue
+                    if (onerror)
+                    {
+                        onerror(e);
+                        continue;
+                    }
+                    // if not, call onabort and then bail out
+                    if (onabort)
+                    {
+                        onabort(std::current_exception());
+                    }
                     break;
                 }
                 catch (...)
                 {
-                    onabort(std::current_exception());
+                    if (onabort)
+                    {
+                        onabort(std::current_exception());
+                    }
                     break;
                 }
             }
@@ -77,7 +116,7 @@ namespace supermon
         }
     }
 
-    void agent::dispatch(const std::shared_ptr<boost::asio::streambuf>& streambuf)
+    void agent::dispatch(std::shared_ptr<boost::asio::streambuf> streambuf)
     {
         std::istream is(&*streambuf);
         auto message = std::make_shared<boost::property_tree::ptree>();
@@ -86,19 +125,18 @@ namespace supermon
             boost::property_tree::read_json(is, *message);
             auto body = std::shared_ptr<boost::property_tree::ptree>(message, &message->begin()->second);
 
-            onmessage(message->begin()->first, body);
+            if (onmessage) onmessage(message->begin()->first, body);
         }
-        catch (const boost::property_tree::json_parser_error& e)
+        catch (const std::runtime_error& e)
         {
-            // TODO
-            std::cerr << "failed to parse incoming json message" << std::endl;
+            if (onerror) onerror(e);
         }
-        listen();
+        listen(streambuf);
     }
 
-    void agent::retry(std::chrono::seconds timeout)
+    void agent::retry(std::chrono::seconds interval)
     {
-        _timer.expires_from_now(timeout);
+        _timer.expires_from_now(interval);
         _timer.async_wait([this](const boost::system::error_code& error)
         {
             if (error != boost::asio::error::operation_aborted)
@@ -108,16 +146,14 @@ namespace supermon
         });
     }
 
-    void agent::listen()
+    void agent::listen(std::shared_ptr<boost::asio::streambuf> buffer)
     {
-        auto streambuf = std::make_shared<boost::asio::streambuf>();
-        //auto opcode = std::make_shared<beast::websocket::opcode>();
+        auto streambuf = nullptr != buffer ? buffer : std::make_shared<boost::asio::streambuf>();
 
         _websocket.async_read
         (
-            //*opcode,
             *streambuf,
-            [this, /*opcode,*/ streambuf](const boost::system::error_code& error)
+            [this, streambuf](const boost::system::error_code& error)
             {
                 if (error)
                 {
@@ -125,17 +161,20 @@ namespace supermon
                     {
                         case (int)beast::websocket::error::closed:
                         case (int)boost::asio::error::eof:
-                            ondisconnect(error);
+                            if (ondisconnect) ondisconnect(error);
                             retry();
                             return;
 
                         default: throw std::runtime_error((std::to_string(error.value()) + ": " + error.message()).c_str());
                     }
                 }
-                else //if (beast::websocket::opcode::text == *opcode)
+                else
                 {
                     dispatch(streambuf);
-                    streambuf->consume(streambuf->size()); // do we have to do this?
+                    if (0 < streambuf->size())
+                    {
+                        streambuf->consume(streambuf->size());
+                    }
                 }
             }
         );
@@ -149,19 +188,19 @@ namespace supermon
         _websocket.write(buffer.data());
     }
     
-    void agent::send(const std::string& tag, const boost::property_tree::ptree& message)
+    void agent::send(const std::string& channel, const boost::property_tree::ptree& message)
     {
         boost::property_tree::ptree msg;
-        msg.put("push.channel", tag);
+        msg.put("push.channel", channel);
         msg.put_child("push.event", message);
         send(msg);
     }
 
-    void agent::send(const std::string& tag, const std::string& message)
+    void agent::send(const std::string& channel, const std::string& message)
     {
         boost::property_tree::ptree msg;
         msg.put("text", message);
-        send(tag, msg);
+        send(channel, msg);
     }
 
     void agent::alert(const std::string& text)
@@ -190,7 +229,7 @@ namespace supermon
             {
                 if (!error)
                 {
-                    _websocket.handshake(_config.host, _config.url);
+                    _websocket.handshake(_config.host, "/api");
 
                     std::vector<std::string> words;
                     boost::algorithm::split(words, _config.name, boost::algorithm::is_any_of("/\\"));
@@ -205,13 +244,13 @@ namespace supermon
 
                     send(login);
                     
-                    onconnect();
+                    if (onconnect) onconnect();
                     
                     listen();
                 }
                 else
                 {
-                    ondisconnect(error);
+                    if (ondisconnect) ondisconnect(error);
                     retry();
                 }
             }

@@ -38,8 +38,16 @@ namespace supermon
         std::string   instance;
         std::string   host = {"localhost"};
         std::uint16_t port = 8080;
-        std::string   url = {"/api"};
     };
+
+    namespace callback
+    {
+        using abort      = std::function<void (std::exception_ptr)>;
+        using error      = std::function<void (const std::exception&)>;
+        using connect    = std::function<void ()>;
+        using disconnect = std::function<void (const boost::system::error_code&)>;
+        using message    = std::function<void (const std::string&, std::shared_ptr<boost::property_tree::ptree>)>;
+    }
 
     class agent final
     {
@@ -52,25 +60,24 @@ namespace supermon
         void shutdown();
 
     public:
-        void send(const std::string& tag, const boost::property_tree::ptree&);
-        void send(const std::string& tag, const std::string& message);
+        void send(const std::string& channel, const boost::property_tree::ptree&);
+        void send(const std::string& channel, const std::string& message);
         void alert(const std::string& text);
         void info(const std::string& text);
 
     protected:
         void init();
-        void listen();
-        void retry(std::chrono::seconds timeout = std::chrono::seconds(5));
-        void dispatch(const std::shared_ptr<boost::asio::streambuf>&);
+        void listen(std::shared_ptr<boost::asio::streambuf> buffer = nullptr);
+        void retry(std::chrono::seconds interval = std::chrono::seconds(5));
+        void dispatch(std::shared_ptr<boost::asio::streambuf>);
         void send(const boost::property_tree::ptree&, bool indent = false);
 
     public:
-        std::function<void (std::exception_ptr)>                           onabort = [](std::exception_ptr){};
-        std::function<void (const boost::system::error_code&)>             onerror = [](const boost::system::error_code&){};
-        std::function<void ()>                                             onconnect = [](){};
-        std::function<void (const boost::system::error_code&)>             ondisconnect = [](const boost::system::error_code&){};
-        std::function<void (const std::string& tag,
-                            std::shared_ptr<boost::property_tree::ptree>)> onmessage = [](const std::string&, std::shared_ptr<boost::property_tree::ptree>){};
+        callback::abort      onabort;
+        callback::error      onerror;
+        callback::connect    onconnect;
+        callback::disconnect ondisconnect;
+        callback::message    onmessage;
 
     private:
         config                                                  _config;

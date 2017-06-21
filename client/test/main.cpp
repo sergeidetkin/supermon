@@ -27,18 +27,26 @@ int main(int argc, char* argv[])
 {
     try
     {
-        std::cerr << std::this_thread::get_id() << ": start..." << std::endl;
+        std::cerr << std::this_thread::get_id() << ": started..." << std::endl;
 
         boost::asio::io_service io;
         boost::asio::io_service::work work(io);
 
-        supermon::agent agent({1 < argc ? argv[1] : argv[0], 2 < argc ? argv[2] : "abc", "localhost", 8080});
+        supermon::agent agent
+        (
+            {
+                1 < argc ? argv[1] : argv[0],
+                2 < argc ? argv[2] : "abc",
+                "localhost",
+                8080
+            }
+         );
 
-        agent.onerror = [&io](const boost::system::error_code& error)
+        agent.onerror = [&io](const std::exception& error)
         {
             io.post([&io, error]()
             {
-                std::cerr << std::this_thread::get_id() << ": " << error.message() << std::endl;
+                std::cerr << std::this_thread::get_id() << ": " << error.what() << std::endl;
                 io.stop();
             });
         };
@@ -73,6 +81,10 @@ int main(int argc, char* argv[])
                 else if ("shutdown" == tag) {
                     agent.send("warning", "shutting down...");
                     io.stop();
+                }
+                else if ("ping" == tag) {
+                    agent.info(tag);
+                    agent.send("log", request->get<std::string>("user"));
                 }
                 else {
                     agent.info(tag);
