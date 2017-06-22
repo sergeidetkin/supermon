@@ -61,7 +61,7 @@ class EventSource extends EventEmitter
     }
 
     // need this to be able get the stable handler reference to unsubscribe later
-    subscribe(target, event, handler) {
+    subscribe(event, target, handler) {
         let f = handler.bind(target);
         target['on'+event] = f;
 //        this.history(event).forEach((e) => {
@@ -139,7 +139,7 @@ class ApiMessageHandler extends MessageHandler
 {
     constructor(socket) {
         super(socket);
-        api.subscribe(this, 'command', this.oncommand);
+        api.subscribe('command', this, this.oncommand);
     }
 
     onclose(socket, code, reason) {
@@ -243,8 +243,8 @@ class UserMessageHandler extends MessageHandler
 
         this.topic = null;
 
-        user.subscribe(this, 'login', this.onlogin);
-        user.subscribe(this, 'status', this.onstatus);
+        user.subscribe('login', this, this.onlogin);
+        user.subscribe('status', this, this.onstatus);
 
         const message = { "snapshot" : clients };
         this.send(message);
@@ -264,12 +264,12 @@ class UserMessageHandler extends MessageHandler
             if (this.topic.channel != message.channel || this.topic.instance != message.instance || this.topic.name != message.name) {
                 this.onunsubscribe();
                 this.topic = message;
-                channels[this.topic.name + '.' + this.topic.instance][this.topic.channel].subscribe(this, 'update', this.onupdate);
+                channels[this.topic.name + '.' + this.topic.instance][this.topic.channel].subscribe('update', this, this.onupdate);
             }
         }
         else {
             this.topic = message;
-            channels[this.topic.name + '.' + this.topic.instance][this.topic.channel].subscribe(this, 'update', this.onupdate);
+            channels[this.topic.name + '.' + this.topic.instance][this.topic.channel].subscribe('update', this, this.onupdate);
         }
     }
 

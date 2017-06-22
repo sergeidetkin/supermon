@@ -48,7 +48,7 @@ class EventListViewItem extends ListViewItem
         }
         else {
             var element = document.createElement('div');
-            element.classList.add('lv-item');
+            element.classList.add('item');
             super(element);
         }
     }
@@ -70,7 +70,7 @@ class CommandListViewItem extends ListViewItem
         }
         else {
             var element = document.createElement('div');
-            element.classList.add('lv-item');
+            element.classList.add('item');
             super(element);
         }
     }
@@ -113,14 +113,14 @@ class ProcessListViewItem extends ListViewItem
         }
         else {
             var element = document.createElement('div');
-            element.classList.add('lv-item');
+            element.classList.add('item');
 
             var label = document.createElement('div');
-            label.classList.add('lvi-label');
+            label.classList.add('label');
             element.appendChild(label);
 
             var led = document.createElement('span');
-            led.classList.add('lvi-led');
+            led.classList.add('led');
             label.appendChild(led);
 
             var caption = document.createElement('span');
@@ -128,7 +128,7 @@ class ProcessListViewItem extends ListViewItem
             label.appendChild(caption);
 
             var info = document.createElement('div');
-            info.classList.add('lvi-info');
+            info.classList.add('info');
             element.appendChild(info);
 
             super(element);
@@ -168,7 +168,7 @@ class ProcessListViewItem extends ListViewItem
     }
 
     set info(text) {
-        var element = this.element.querySelector('.lvi-info');
+        var element = this.element.querySelector('.info');
         element.textContent = text;
         element.title = text;
     }

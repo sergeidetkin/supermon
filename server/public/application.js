@@ -200,7 +200,7 @@ class Application
 
     onSelectedCommandChanged(e) {
         var input = document.querySelector('#input');
-        var status = document.querySelector('#status-bar > .item > #command');
+        var status = document.querySelector('#statusbar > .item > #command');
         var commandId = null;
         var target = null;
         if (-1 != e.selectedIndex) {
@@ -219,7 +219,7 @@ class Application
     }
 
     onSelectedClientChanged(e) {
-        var status = document.querySelector('#status-bar > .item > #client');
+        var status = document.querySelector('#statusbar > .item > #client');
         var id = -1;
         if (-1 != e.selectedIndex) {
             id = this.processListView.element.children[e.selectedIndex].id;
@@ -285,11 +285,11 @@ class Application
         var bg = this.online ? '#0C0' : 'crimson';
         //var fg = this.online ? 'rgb(80,80,80)' : 'white';
         var fg = 'white';
-        var status = document.querySelector('#status-bar > .item > #status');
+        var status = document.querySelector('#statusbar > .item > #status');
         status.textContent = this.online ? document.location.host : 'connecting...';
         status.style.color = fg;
         status.parentElement.style.backgroundColor = bg;
-        document.querySelector('#status-bar > .item > #connected').textContent = this.connectedClientsCount;
+        document.querySelector('#statusbar > .item > #connected').textContent = this.connectedClientsCount;
     }
 
     get connectedClientsCount() {
@@ -348,7 +348,7 @@ class Application
             }
             else {
                 console.error('failed to reconnect');
-                document.querySelector('#status-bar > .item > #status').textContent = 'offline';
+                document.querySelector('#statusbar > .item > #status').textContent = 'offline';
             }
             
         }.bind(this);

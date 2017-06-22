@@ -33,14 +33,14 @@ body {
 
 div.section-header {
     flex: 0 0 auto;
-    padding: 4px;
-    color: rgba(0,0,0,0.45);
-    background-color: rgba(0,0,0,0.05);
+    padding: 2px;
+    padding-left: 4px;
+    padding-right: 4px;
+    /*color: rgba(0,0,0,0.45);*/
+    background-color: #EEE;
     text-transform: uppercase;
-    font-size: smaller;
-}
-
-#output {
+    font-size: small;
+    /*border-bottom: 1px solid rgb(160,160,160);*/
 }
 
 #input {
@@ -93,11 +93,7 @@ div.section-header {
     flex: 3;
 }
 
-div p {
-    margin: 2px;
-}
-
-.tab-bar {
+.toolbar {
     flex: 0 0 auto !important;
     /*background-color: rgb(230,230,230);*/
     border-bottom: 1px solid rgb(160,160,160);
@@ -105,72 +101,41 @@ div p {
     min-height: 1.5em;
 }
 
-.tab-bar > .item {
+.toolbar > .item {
     flex: 0 0 auto;
     line-height: 1.5em;
     padding-left: 8px;
     padding-right: 8px;
     border-right: 1px solid rgb(160,160,160);
-}
-
-#status-bar > .item:first-child {
-    flex: 0 0 auto;
-    line-height: 1.5em;
-    padding-left: 8px;
-    padding-right: 8px;
-    color:white;
-    border: none;
-    background-color:rgb(88, 159, 215);
-}
-
-#status-bar > .item:not(:first-child) {
-    flex: 0 0 auto;
-    line-height: 1.5em;
-    padding-left: 8px;
-    padding-right: 8px;
-    border-right: 1px solid rgb(160,160,160);
-}
-
-#channel-view {
-    padding: 8px;
 }
 
 .list-view {
     color: inherit
 }
 
-.lv-item {
+.list-view > .item {
     /*background-color: rgb(200,200,200);*/
     padding: 4px;
     overflow: hidden;
     cursor: default;
 }
 
-#commands > .list-view > .lv-item {
-    padding-left: 8px;
+.list-view > .item:nth-child(even) {
+    background-color: #EEE;
 }
 
-.lv-item:nth-child(even) {
-    /*background-color: #EEE;*/
-}
-
-#channel-view > .lv-item{
-    font-size: 10pt;
-    font-family: 'Consolas';
-}
-
-.lvi-label {
+.list-view > .item > .label {
     color: inherit;
 }
 
-.lvi-caption {
+.list-view > .item .lvi-caption {
     color: inherit;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: clip;
 }
 
-.lvi-info {
+.list-view > .item > .info {
     color: inherit;
     font-size: smaller;
     white-space: nowrap;
@@ -178,7 +143,7 @@ div p {
     text-overflow: ellipsis;
 }
 
-.lvi-led {
+.list-view > .item > .label > .led {
     position: relative;
     top: -1px;
     color: white;
@@ -192,62 +157,66 @@ div p {
     margin-right: 4px;
 }
 
-.lv-item > .lvi-label > .lvi-led {
+.list-view > .item > .label > .led {
     background-color: crimson;
 }
 
-.lv-item > .lvi-label > .lvi-led::after {
+.list-view > .item > .label > .led::after {
     content: "offline";
 }
 
-.online > .lvi-label > .lvi-led {
-    background-color: #0C0;
+#statusbar > .item:first-child {
+    flex: 0 0 auto;
+    line-height: 1.5em;
+    padding-left: 8px;
+    padding-right: 8px;
+    color:white;
+    border: none;
+    background-color:rgb(88, 159, 215);
 }
 
-.online > .lvi-label > .lvi-led::after {
-    content: "online";
+#statusbar > .item:not(:first-child) {
+    flex: 0 0 auto;
+    line-height: 1.5em;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-right: 1px solid rgb(160,160,160);
 }
 
-.alert > .lvi-label > .lvi-led {
-    background-color: darkorange;
+#channel-bar > .item {
+    /*border-top: 1px solid rgb(160,160,160);*/
 }
 
-.alert > .lvi-label > .lvi-led::after {
-    content: "alert";
+#channel-view {
+    padding: 8px;
+}
+
+#commands > .list-view > .item {
+    padding-left: 8px;
+}
+
+#channel-view > .item {
+    font-size: 10pt;
+    font-family: 'Consolas';
+}
+
+.online > .label > .led {
+    background-color: #0C0 !important;
+}
+
+.online > .label > .led::after {
+    content: "online" !important;
+}
+
+.alert > .label > .led {
+    background-color: darkorange !important;
+}
+
+.alert > .label > .led::after {
+    content: "alert" !important;
 }
 
 .selected {
     color: white;
-    background-color: rgb(88, 159, 215);
+    background-color: rgb(88, 159, 215) !important;
 }
-
-.selected:nth-child(even) {
-    background-color: rgb(88, 159, 215);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
