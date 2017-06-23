@@ -3,10 +3,10 @@ var enumerations = {};
 
 enumerations.time =
 [
-    { name: "Now",              value: "0"},
-    { name: "Later",            value: "1"},
-    { name: "In a few minutes", value: "3"},
-    { name: "Tomorrow",         value: "4"}
+    { name: "Now",              value: 0},
+    { name: "Later",            value: 1},
+    { name: "In a few minutes", value: 2},
+    { name: "Tomorrow",         value: 3}
 ];
 
 enumerations.colors =

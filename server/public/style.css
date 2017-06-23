@@ -27,7 +27,7 @@ body {
 
 #left {
     flex: 0 0 30ch;
-    /*background-color: rgb(209,217,223);*/
+    /*background-color: rgb(225,229,234);*/
     border-right: 1px solid rgb(160,160,160);
 }
 
@@ -37,9 +37,10 @@ div.section-header {
     padding-left: 4px;
     padding-right: 4px;
     /*color: rgba(0,0,0,0.45);*/
-    background-color: #EEE;
+    background-color: rgba(0, 80, 100, 0.1);
     text-transform: uppercase;
     font-size: small;
+    font-weight: bold;
     /*border-bottom: 1px solid rgb(160,160,160);*/
 }
 
@@ -120,7 +121,11 @@ div.section-header {
     cursor: default;
 }
 
-.list-view > .item:nth-child(even) {
+.item:hover {
+    background-color: rgba(0, 80, 100, 0.1);
+}
+
+.list-view#channel-view > .item:nth-child(even) {
     background-color: #EEE;
 }
 
@@ -129,27 +134,36 @@ div.section-header {
 }
 
 .list-view > .item .lvi-caption {
-    color: inherit;
+    color: rgb(20,20,20);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: clip;
 }
 
 .list-view > .item > .info {
-    color: inherit;
+    color: rgb(128,128,128);
     font-size: smaller;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.list-view > .item > .label > .led {
+.list-view > .selected > .info {
+    color: inherit;
+}
+
+.list-view > .selected .lvi-caption {
+    color: inherit;
+}
+
+.led {
     position: relative;
     top: -1px;
     color: white;
     font-size: small;
     text-transform: uppercase;
-    border-radius: 3px;
+    /*border-radius: 3px;*/
+    border-radius: 1em;
     vertical-align: middle;
     padding-left: 8px;
     padding-right: 8px;
@@ -157,12 +171,16 @@ div.section-header {
     margin-right: 4px;
 }
 
-.list-view > .item > .label > .led {
+.led {
     background-color: crimson;
 }
 
-.list-view > .item > .label > .led::after {
-    content: "offline";
+.led::after {
+    /*content: "offline";*/
+}
+
+.list-view#proc-view > .item {
+    border-bottom: 1px solid rgb(160,160,160);
 }
 
 #statusbar > .item:first-child {
@@ -170,9 +188,7 @@ div.section-header {
     line-height: 1.5em;
     padding-left: 8px;
     padding-right: 8px;
-    color:white;
     border: none;
-    background-color:rgb(88, 159, 215);
 }
 
 #statusbar > .item:not(:first-child) {
@@ -205,7 +221,7 @@ div.section-header {
 }
 
 .online > .label > .led::after {
-    content: "online" !important;
+    /*content: "online" !important;*/
 }
 
 .alert > .label > .led {
@@ -213,10 +229,11 @@ div.section-header {
 }
 
 .alert > .label > .led::after {
-    content: "alert" !important;
+    /*content: "alert" !important;*/
 }
 
 .selected {
-    color: white;
-    background-color: rgb(88, 159, 215) !important;
+    color: white !important;
+    /*background-color: rgb(51, 119, 208) !important;*/
+    background-color: slategray !important;
 }

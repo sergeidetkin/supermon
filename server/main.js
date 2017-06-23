@@ -61,16 +61,23 @@ class EventSource extends EventEmitter
     }
 
     // need this to be able get the stable handler reference to unsubscribe later
-    subscribe(event, target, handler) {
+    subscribe(event, target, handler, snapshot) {
         let f = handler.bind(target);
         target['on'+event] = f;
-//        this.history(event).forEach((e) => {
-//            f(e);
-//        });
-        const hist = this.history(event);
-        if (0 < hist.length) {
-            f(this.history(event));
+
+        const history = this.history(event);
+
+        if (0 < history.length) {
+            if (snapshot) {
+                f(history);
+            }
+            else {
+                history.forEach((e) => {
+                    f(e);
+                });
+            }
         }
+
         this.on(event, f);
     }
 
@@ -264,12 +271,12 @@ class UserMessageHandler extends MessageHandler
             if (this.topic.channel != message.channel || this.topic.instance != message.instance || this.topic.name != message.name) {
                 this.onunsubscribe();
                 this.topic = message;
-                channels[this.topic.name + '.' + this.topic.instance][this.topic.channel].subscribe('update', this, this.onupdate);
+                channels[this.topic.name + '.' + this.topic.instance][this.topic.channel].subscribe('update', this, this.onupdate, true);
             }
         }
         else {
             this.topic = message;
-            channels[this.topic.name + '.' + this.topic.instance][this.topic.channel].subscribe('update', this, this.onupdate);
+            channels[this.topic.name + '.' + this.topic.instance][this.topic.channel].subscribe('update', this, this.onupdate, true);
         }
     }
 

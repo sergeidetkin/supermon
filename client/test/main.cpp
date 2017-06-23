@@ -97,7 +97,10 @@ int main(int argc, char* argv[])
                     agent.send("warning", "raised alert '" + text + "'");
                 }
                 else if ("shutdown" == tag) {
-                    agent.send("warning", "shutting down...");
+                    std::ostringstream os;
+                    boost::property_tree::write_json(os, *request, false);
+                    os << ": shutting down...";
+                    agent.send("warning", os.str());
                     io.stop();
                 }
                 else if ("ping" == tag) {
@@ -112,24 +115,36 @@ int main(int argc, char* argv[])
         };
 
         agent.connect();
-/*
+
         boost::asio::system_timer timer(io);
 
-        std::function<void(const boost::system::error_code&)> tick = [&timer, &agent, &tick](const boost::system::error_code& error)
+        bool flag = true;
+        std::function<void(const boost::system::error_code&)> tick = [&timer, &agent, &tick, &flag](const boost::system::error_code& error) mutable
         {
             if (error != boost::asio::error::operation_aborted)
             {
                 auto ticks = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
                 agent.send("log", "the time now is: " + std::to_string(ticks));
 
-                timer.expires_from_now(std::chrono::milliseconds(50));
+                if (flag)
+                {
+                    agent.alert("bad!");
+                }
+                else
+                {
+                    agent.info("good");
+                }
+
+                flag = !flag;
+
+                timer.expires_from_now(std::chrono::milliseconds(5000));
                 timer.async_wait(tick);
             }
         };
 
-        timer.expires_from_now(std::chrono::milliseconds(50));
+        timer.expires_from_now(std::chrono::milliseconds(5000));
         timer.async_wait(tick);
-*/
+
         io.run();
 
         std::cerr << std::this_thread::get_id() << ": done." << std::endl;

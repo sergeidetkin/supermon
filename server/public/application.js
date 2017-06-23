@@ -30,7 +30,7 @@ class Application
     constructor() {
         this.clients = {};
 
-        this.processListView = new ListView(document.querySelector('#apps > .list-view'));
+        this.processListView = new ListView(document.querySelector('#proc-view'));
         this.processListView.addEventListener('change', this.onSelectedClientChanged.bind(this));
 
         this.commandsListView = new ListView(document.querySelector('#commands > .list-view'));
@@ -283,7 +283,6 @@ class Application
 
     updateStatusBar() {
         var bg = this.online ? '#0C0' : 'crimson';
-        //var fg = this.online ? 'rgb(80,80,80)' : 'white';
         var fg = 'white';
         var status = document.querySelector('#statusbar > .item > #status');
         status.textContent = this.online ? document.location.host : 'connecting...';
