@@ -30,6 +30,7 @@ class EventSource extends EventEmitter
 {
     constructor(args) {
         super();
+        this.setMaxListeners(0);
         this.cache = {};
         const options = args || { history: 0 };
         this.cache_max = options.history || 0;

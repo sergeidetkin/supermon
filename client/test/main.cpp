@@ -31,11 +31,11 @@ int main(int argc, char* argv[])
         namespace config = boost::program_options;
         config::options_description options("options");
         options.add_options()
-            ("help",     "print this message")
-            ("alias",    config::value<std::string>(), "use 'alias' instead of the executable's name")
-            ("instance", config::value<std::string>(), "set the process instance")
-            ("host",     config::value<std::string>()->default_value("localhost"), "supermon server host")
-            ("port",     config::value<std::uint16_t>()->default_value(8080), "supermon server port");
+            ("help,?",                                                               ": print this message")
+            ("alias,a",    config::value<std::string>(),                             ": use 'arg' instead of the executable's name")
+            ("instance,i", config::value<std::string>(),                             ": set the process instance")
+            ("host,h",     config::value<std::string>()->default_value("localhost"), ": supermon server host")
+            ("port,p",     config::value<std::uint16_t>()->default_value(8080),      ": supermon server port");
 
         config::variables_map arguments;
         config::store(config::parse_command_line(argc, argv, options), arguments);
@@ -60,12 +60,12 @@ int main(int argc, char* argv[])
             arguments["port"].as<std::uint16_t>()
         });
 
-        agent.onerror = [&io](const std::exception& error)
+        agent.onerror = [&io](const std::runtime_error& error)
         {
             io.post([&io, error]()
             {
-                std::cerr << std::this_thread::get_id() << ": " << error.what() << std::endl;
-                io.stop();
+                std::cerr << std::this_thread::get_id() << ": error: " << error.what() << std::endl;
+                //io.stop();
             });
         };
 
@@ -78,11 +78,11 @@ int main(int argc, char* argv[])
             });
         };
 
-        agent.ondisconnect = [&io](const boost::system::error_code&)
+        agent.ondisconnect = [&io](const std::runtime_error& error)
         {
-            io.post([&io]()
+            io.post([&io, error]()
             {
-                std::cout << std::this_thread::get_id() << ": disconnected :(" << std::endl;
+                std::cout << std::this_thread::get_id() << ": disconnected: " << error.what() << std::endl;
                 //io.stop();
             });
         };
@@ -151,7 +151,7 @@ int main(int argc, char* argv[])
     }
     catch (const std::exception& e)
     {
-        std::cerr << std::this_thread::get_id() << ": " << e.what() << std::endl;
+        std::cerr << std::this_thread::get_id() << ": main thread exception: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
 

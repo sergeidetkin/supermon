@@ -43,9 +43,9 @@ namespace supermon
     namespace callback
     {
         using abort      = std::function<void (std::exception_ptr)>;
-        using error      = std::function<void (const std::exception&)>;
+        using error      = std::function<void (const std::runtime_error&)>;
         using connect    = std::function<void ()>;
-        using disconnect = std::function<void (const boost::system::error_code&)>;
+        using disconnect = std::function<void (const std::runtime_error&)>;
         using message    = std::function<void (const std::string&, std::shared_ptr<boost::property_tree::ptree>)>;
     }
 

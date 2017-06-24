@@ -82,7 +82,7 @@ namespace supermon
                     // if there is a handler for soft error call it and continue
                     if (onerror)
                     {
-                        onerror(e);
+                        onerror(std::runtime_error(e.what()));
                         continue;
                     }
                     // if not, call onabort and then bail out
@@ -127,9 +127,9 @@ namespace supermon
 
             if (onmessage) onmessage(message->begin()->first, body);
         }
-        catch (const std::runtime_error& e)
+        catch (const std::exception& e)
         {
-            if (onerror) onerror(e);
+            if (onerror) onerror(std::runtime_error(e.what()));
         }
         listen(streambuf);
     }
@@ -161,7 +161,7 @@ namespace supermon
                     {
                         case (int)beast::websocket::error::closed:
                         case (int)boost::asio::error::eof:
-                            if (ondisconnect) ondisconnect(error);
+                            if (ondisconnect) ondisconnect(std::runtime_error(error.message()));
                             retry();
                             return;
 
@@ -185,7 +185,14 @@ namespace supermon
         boost::asio::streambuf buffer;
         std::ostream os(&buffer);
         boost::property_tree::write_json(os, message, indent);
-        _websocket.write(buffer.data());
+        try
+        {
+            _websocket.write(buffer.data());
+        }
+        catch (const std::exception& e)
+        {
+            if (onerror) onerror(std::runtime_error(e.what()));
+        }
     }
     
     void agent::send(const std::string& channel, const boost::property_tree::ptree& message)
@@ -250,7 +257,7 @@ namespace supermon
                 }
                 else
                 {
-                    if (ondisconnect) ondisconnect(error);
+                    if (ondisconnect) ondisconnect(std::runtime_error(error.message()));
                     retry();
                 }
             }
