@@ -27,6 +27,7 @@
 #include "boost/process/environment.hpp"
 #include "boost/algorithm/string/split.hpp"
 #include "boost/algorithm/string/classification.hpp"
+#include "boost/algorithm/string/replace.hpp"
 #include "boost/property_tree/ptree.hpp"
 #include "boost/property_tree/json_parser.hpp"
 
@@ -180,13 +181,13 @@ namespace supermon
         );
     }
 
-    void agent::send(const boost::property_tree::ptree& message, bool indent)
+    void agent::send(const boost::property_tree::ptree& message)
     {
-        boost::asio::streambuf buffer;
-        std::ostream os(&buffer);
-        boost::property_tree::write_json(os, message, indent);
         try
         {
+            boost::asio::streambuf buffer;
+            std::ostream os(&buffer);
+            boost::property_tree::write_json(os, message, false);
             _websocket.write(buffer.data());
         }
         catch (const std::exception& e)
@@ -194,20 +195,39 @@ namespace supermon
             if (onerror) onerror(std::runtime_error(e.what()));
         }
     }
-    
-    void agent::send(const std::string& channel, const boost::property_tree::ptree& message)
+
+    void agent::send(const std::string& channel, const dataset& data)
     {
-        boost::property_tree::ptree msg;
-        msg.put("push.channel", channel);
-        msg.put_child("push.event", message);
-        send(msg);
+        try
+        {
+            boost::asio::streambuf buffer;
+            std::ostream os(&buffer);
+            os << "{\"push\":{\"channel\":\"" << channel << "\",\"event\":{\"data\":";
+            os << data;
+            os << "}}}";
+            _websocket.write(buffer.data());
+        }
+        catch (const std::exception& e)
+        {
+            if (onerror) onerror(std::runtime_error(e.what()));
+        }
     }
 
-    void agent::send(const std::string& channel, const std::string& message)
+    void agent::send(const std::string& channel, const std::string& text)
     {
-        boost::property_tree::ptree msg;
-        msg.put("text", message);
-        send(channel, msg);
+        try
+        {
+            boost::asio::streambuf buffer;
+            std::ostream os(&buffer);
+            os << "{\"push\":{\"channel\":\"" << channel << "\",\"event\":{\"text\":";
+            os << "\"" << boost::algorithm::replace_all_copy(text, "\"", "\\\"") << "\"";
+            os << "}}}";
+            _websocket.write(buffer.data());
+        }
+        catch (const std::exception& e)
+        {
+            if (onerror) onerror(std::runtime_error(e.what()));
+        }
     }
 
     void agent::alert(const std::string& text)

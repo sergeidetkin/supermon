@@ -18,6 +18,7 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <tuple>
 
 #include "boost/property_tree/json_parser.hpp"
 #include "boost/program_options.hpp"
@@ -87,7 +88,7 @@ int main(int argc, char* argv[])
             });
         };
 
-        agent.onmessage = [&io, &agent](const std::string& tag, std::shared_ptr<boost::property_tree::ptree> request)
+        agent.onmessage = [&io, &agent](const std::string& tag, const std::shared_ptr<boost::property_tree::ptree>& request)
         {
             io.post([&io, &agent, tag, request]()
             {
@@ -95,6 +96,15 @@ int main(int argc, char* argv[])
                     std::string text = request->get<std::string>("text");
                     agent.alert(text);
                     agent.send("warning", "raised alert '" + text + "'");
+                }
+                else if ("send_data" == tag)
+                {
+                    supermon::dataset data;
+
+                    data.insert(1, "foo", 0.3, false);
+                    data.insert(tag, 3.1415, "blah", true);
+
+                    agent.send("weather", data);
                 }
                 else if ("shutdown" == tag) {
                     std::ostringstream os;
@@ -128,11 +138,11 @@ int main(int argc, char* argv[])
 
                 if (flag)
                 {
-                    agent.alert("bad!");
+                    agent.alert("testing, attention please!");
                 }
                 else
                 {
-                    agent.info("good");
+                    agent.info("blah blah blah");
                 }
 
                 flag = !flag;

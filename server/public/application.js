@@ -390,7 +390,12 @@ class Application
         }
         else {
             var it = new EventListViewItem();
-            it.text = (new Date(message.when)).strtime() + ': ' + message.event.text;
+            if (message.event.text) {
+                it.text = (new Date(message.when)).strtime() + ': ' + message.event.text;
+            }
+            else if (message.event.data) {
+                it.text = (new Date(message.when)).strtime() + ': ' + JSON.stringify(message.event.data);
+            }
             this.channelView.add(it);
         }
     }

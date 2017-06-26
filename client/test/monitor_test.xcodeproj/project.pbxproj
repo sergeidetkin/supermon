@@ -29,6 +29,7 @@
 		223F07BC1EFA041A00DAE156 /* libboost_program_options.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_program_options.a; path = "../../../boost-1.65/bin.v2/libs/program_options/build/darwin-4.2.1/release/link-static/threading-multi/libboost_program_options.a"; sourceTree = "<group>"; };
 		224ED4201EF398D100D926C4 /* monitor_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = monitor_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		224ED42A1EF39A7300D926C4 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = main.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
+		227010551F006E0B00038252 /* dataset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dataset.h; path = ../include/supermon/dataset.h; sourceTree = "<group>"; };
 		2276DB901EF3A7BA00A48F47 /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = "../../../boost-1.65/bin.v2/libs/system/build/darwin-4.2.1/release/link-static/threading-multi/libboost_system.a"; sourceTree = "<group>"; };
 		228F0B3C1EF4DFC400E90748 /* agent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = agent.h; path = ../include/supermon/agent.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		228F0B3E1EF4DFC400E90748 /* agent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = agent.cpp; path = ../src/agent.cpp; sourceTree = "<group>"; };
@@ -79,6 +80,7 @@
 			children = (
 				228F0B3E1EF4DFC400E90748 /* agent.cpp */,
 				228F0B3C1EF4DFC400E90748 /* agent.h */,
+				227010551F006E0B00038252 /* dataset.h */,
 			);
 			name = supermon;
 			sourceTree = "<group>";

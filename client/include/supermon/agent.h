@@ -29,6 +29,8 @@
 
 #include "beast/websocket.hpp"
 
+#include "supermon/dataset.h"
+
 namespace supermon
 {
 
@@ -46,7 +48,7 @@ namespace supermon
         using error      = std::function<void (const std::runtime_error&)>;
         using connect    = std::function<void ()>;
         using disconnect = std::function<void (const std::runtime_error&)>;
-        using message    = std::function<void (const std::string&, std::shared_ptr<boost::property_tree::ptree>)>;
+        using message    = std::function<void (const std::string&, const std::shared_ptr<boost::property_tree::ptree>&)>;
     }
 
     class agent final
@@ -60,8 +62,8 @@ namespace supermon
         void shutdown();
 
     public:
-        void send(const std::string& channel, const boost::property_tree::ptree&);
         void send(const std::string& channel, const std::string& message);
+        void send(const std::string& channel, const dataset& data);
         void alert(const std::string& text);
         void info(const std::string& text);
 
@@ -70,7 +72,7 @@ namespace supermon
         void listen(std::shared_ptr<boost::asio::streambuf> buffer = nullptr);
         void retry(std::chrono::seconds interval = std::chrono::seconds(5));
         void dispatch(std::shared_ptr<boost::asio::streambuf>);
-        void send(const boost::property_tree::ptree&, bool indent = false);
+        void send(const boost::property_tree::ptree&);
 
     public:
         callback::abort      onabort;

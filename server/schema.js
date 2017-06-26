@@ -58,6 +58,9 @@ commands.monitor_test =
 
 commands.monitor =
 {
+    send_data: {
+        name: "send data"
+    },
     ping: {
         name: "ping process",
         description: "Ping the process",
@@ -111,6 +114,9 @@ channels.monitor =
     error: {
         name: "errors",
         history: 100
+    },
+    weather: {
+        name: "weather report"
     }
 };
 

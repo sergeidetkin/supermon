@@ -1,6 +1,5 @@
 * {
-    /*font-size: 14pt;*/
-    font-family: 'Helvetica';
+    font-family: sans-serif;
     color: rgb(80,80,80);
 }
 
@@ -76,6 +75,7 @@ div.section-header {
 #input input {
     margin: 0px;
     min-width: 30ch;
+    font-size: inherit;
 }
 
 #input input[type=button] {
