@@ -202,7 +202,7 @@ namespace supermon
         {
             boost::asio::streambuf buffer;
             std::ostream os(&buffer);
-            os << "{\"push\":{\"channel\":\"" << channel << "\",\"event\":{\"data\":";
+            os << R"({"push":{"channel":")" << channel << R"(","event":{"data":)";
             os << data;
             os << "}}}";
             _websocket.write(buffer.data());
@@ -215,19 +215,10 @@ namespace supermon
 
     void agent::send(const std::string& channel, const std::string& text)
     {
-        try
-        {
-            boost::asio::streambuf buffer;
-            std::ostream os(&buffer);
-            os << "{\"push\":{\"channel\":\"" << channel << "\",\"event\":{\"text\":";
-            os << "\"" << boost::algorithm::replace_all_copy(text, "\"", "\\\"") << "\"";
-            os << "}}}";
-            _websocket.write(buffer.data());
-        }
-        catch (const std::exception& e)
-        {
-            if (onerror) onerror(std::runtime_error(e.what()));
-        }
+        boost::property_tree::ptree msg;
+        msg.put("push.channel", channel);
+        msg.put("push.event.text", text);
+        send(msg);
     }
 
     void agent::alert(const std::string& text)

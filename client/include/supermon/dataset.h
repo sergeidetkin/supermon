@@ -33,21 +33,20 @@ namespace supermon
         {
         public:
             template<typename T>
-            void add(T&& value)
+            typename std::enable_if<std::is_arithmetic<std::decay<T>>::value>::type
+            add(T&& value)
             {
-                if (std::is_arithmetic<typename std::decay<T>::type>::value)
-                {
-                    push_back([value](std::ostream& os) -> std::ostream& { os << value; return os; });
-                }
-                else
-                {
-                    push_back([value](std::ostream& os) -> std::ostream& { os << '"' << value << '"'; return os; });
-                }
+                push_back([value](std::ostream& os) -> std::ostream& { os << value; return os; });
             }
 
             void add(const std::string& value)
             {
                 push_back([value = boost::algorithm::replace_all_copy(value, "\"", "\\\"")](std::ostream& os) -> std::ostream& { os << '"' << value << '"'; return os; });
+            }
+
+            void add(bool value)
+            {
+                push_back([value](std::ostream& os) -> std::ostream& { os << std::boolalpha << value; return os; });
             }
 
             template<typename ...ARGS>
@@ -64,6 +63,11 @@ namespace supermon
         {
             row& r = *(_rows.emplace(_rows.end()));
             r.add_pack(std::forward<ARGS>(args)...);
+        }
+
+        row& insertRow()
+        {
+            return *(_rows.emplace(_rows.end()));
         }
 
     public:

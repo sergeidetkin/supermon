@@ -153,7 +153,7 @@ int main(int argc, char* argv[])
         };
 
         timer.expires_from_now(std::chrono::milliseconds(5000));
-        timer.async_wait(tick);
+        //timer.async_wait(tick);
 
         io.run();
 

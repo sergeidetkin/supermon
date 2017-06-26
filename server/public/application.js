@@ -390,10 +390,10 @@ class Application
         }
         else {
             var it = new EventListViewItem();
-            if (message.event.text) {
+            if (message.event.hasOwnProperty('text')) {
                 it.text = (new Date(message.when)).strtime() + ': ' + message.event.text;
             }
-            else if (message.event.data) {
+            else if (message.event.hasOwnProperty('data')) {
                 it.text = (new Date(message.when)).strtime() + ': ' + JSON.stringify(message.event.data);
             }
             this.channelView.add(it);
