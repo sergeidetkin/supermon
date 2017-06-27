@@ -18,6 +18,7 @@
 #define supermon_data_h
 
 #include <vector>
+#include <string>
 #include <functional>
 #include <type_traits>
 
@@ -33,20 +34,42 @@ namespace supermon
         {
         public:
             template<typename T>
-            typename std::enable_if<std::is_arithmetic<std::decay<T>>::value>::type
+            typename std::enable_if<std::is_arithmetic<typename std::decay<T>::type>::value ||
+                                    std::is_same<bool, typename std::decay<T>::type>::value>::type
             add(T&& value)
             {
-                push_back([value](std::ostream& os) -> std::ostream& { os << value; return os; });
+                push_back
+                (
+                    [value](std::ostream& os) -> std::ostream&
+                    {
+                        os << std::boolalpha << value;
+                        return os;
+                    }
+                );
             }
 
             void add(const std::string& value)
             {
-                push_back([value = boost::algorithm::replace_all_copy(value, "\"", "\\\"")](std::ostream& os) -> std::ostream& { os << '"' << value << '"'; return os; });
+                push_back
+                (
+                    [value = boost::algorithm::replace_all_copy(value, "\"", "\\\"")](std::ostream& os) -> std::ostream&
+                    {
+                        os << '"' << value << '"';
+                        return os;
+                    }
+                );
             }
 
-            void add(bool value)
+            void add(std::nullptr_t)
             {
-                push_back([value](std::ostream& os) -> std::ostream& { os << std::boolalpha << value; return os; });
+                push_back
+                (
+                    [](std::ostream& os) -> std::ostream&
+                    {
+                        os << "null";
+                        return os;
+                    }
+                );
             }
 
             template<typename ...ARGS>

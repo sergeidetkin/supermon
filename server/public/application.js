@@ -380,6 +380,9 @@ class Application
         //console.debug('update', message);
         if (Array.isArray(message)) {
             this.channelView.autoScroll = false;
+            if (0 < message.length) {
+                this.channelView.maxCount = this.clients[identify(message[0].source)].channels[message[0].channel].history || 100;
+            }
             for (var n = 0; n < message.length; ++n) {
                 var item = message[n];
                 var it = new EventListViewItem();
@@ -389,12 +392,17 @@ class Application
             this.channelView.autoScroll = true;
         }
         else {
-            var it = new EventListViewItem();
+            var it = null;
             if (message.event.hasOwnProperty('text')) {
+                this.channelView.maxCount = this.clients[identify(message.source)].channels[message.channel].history || 100;
+                it = new EventListViewItem();
                 it.text = (new Date(message.when)).strtime() + ': ' + message.event.text;
             }
             else if (message.event.hasOwnProperty('data')) {
-                it.text = (new Date(message.when)).strtime() + ': ' + JSON.stringify(message.event.data);
+                this.channelView.maxCount = 1;
+                it = new TableView();
+                it.columns = this.clients[identify(message.source)].channels[message.channel].columns;
+                it.data = message.event.data;
             }
             this.channelView.add(it);
         }

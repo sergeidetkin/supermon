@@ -33,6 +33,44 @@ class View
     }
 }
 
+class TableView extends View
+{
+    constructor() {
+        if (0 < arguments.length) {
+            super(arguments[0]);
+        }
+        else {
+            var element = document.createElement('table');
+            element.classList.add('dataset');
+            super(element);
+        }
+    }
+
+    set columns(src) {
+        var table = this.element.createTHead();
+        var row = table.insertRow();
+        var cell = row.insertCell();
+        cell.textContent = ' ';
+        for (var c = 0; c < src.length; ++c) {
+            cell = row.insertCell();
+            cell.textContent = src[c];
+        }
+    }
+
+    set data(src) {
+        var table = this.element.createTBody();
+        for (var r = 0; r < src.length; ++r) {
+            var row = table.insertRow();
+            var cell = row.insertCell();
+            cell.textContent = r + 1;
+            for (var c = 0; c < src[r].length; ++c) {
+                cell = row.insertCell();
+                cell.textContent = src[r][c];
+            }
+        }
+    }
+}
+
 class ListViewItem extends View
 {
     constructor(element) {
@@ -224,7 +262,7 @@ class ListView extends View
         item.element.itemIndex = this.element.childElementCount;
         this.element.appendChild(item.element);
         item.element.addEventListener('click', this.onItemClick.bind(this));
-        if (-1 == this.selectedIndex && this.autoScroll) {
+        if (1 != this.maxCount && -1 == this.selectedIndex && this.autoScroll) {
             item.element.scrollIntoView({behavior: 'instant'});
         }
     }
@@ -238,9 +276,11 @@ class ListView extends View
         if (-1 != this.selectedIndex) {
             this.element.children[this.selectedIndex].classList.remove('selected');
         }
-        this.selectedIndex = e.currentTarget.itemIndex;
-        e.currentTarget.classList.add('selected');
-        e.stopPropagation();
+        if (1 != this.maxCount) {
+            this.selectedIndex = e.currentTarget.itemIndex;
+            e.currentTarget.classList.add('selected');
+            e.stopPropagation();
+        }
     }
 
     onClick(e) {

@@ -213,7 +213,7 @@ div.section-header {
 }
 
 #channel-view {
-    padding: 8px;
+    /*padding: 8px;*/
 }
 
 #commands > .list-view > .item {
@@ -222,7 +222,7 @@ div.section-header {
 
 #channel-view > .item {
     font-size: 10pt;
-    font-family: 'Consolas';
+    font-family: 'Consolas', monospace;
 }
 
 .online > .label > .led {
@@ -245,4 +245,28 @@ div.section-header {
     color: white !important;
     /*background-color: rgb(51, 119, 208) !important;*/
     background-color: slategray !important;
+}
+
+.dataset {
+    position: relative;
+    border-collapse: collapse;
+}
+
+.dataset td {
+    padding: 2px;
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: smaller;
+    /*font-family: 'Consolas', monospace;*/
+    border-right: 1px solid rgb(160,160,160);
+    border-bottom: 1px solid rgb(160,160,160);
+}
+
+.dataset thead tr td {
+    color: rgb(20, 20, 20);
+    background-color: #EEE;
+}
+
+.dataset tbody tr td:first-child {
+    background-color: #EEE;
 }

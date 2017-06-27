@@ -99,12 +99,20 @@ int main(int argc, char* argv[])
                 }
                 else if ("send_data" == tag)
                 {
+                    agent.send("log", "executing " + tag + "...");
+                    auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
                     supermon::dataset data;
 
-                    data.insert(1, "foo", 0.3, false);
-                    data.insert(tag, 3.1415, "blah", true);
+                    for (size_t n = 0; n < 10; ++n) {
+                        data.insert(std::to_string(timestamp), "foo", nullptr, false, "New York", "NY", "blah", "bar");
+                        data.insert(true, std::to_string(timestamp), "blah", tag, "London", "UK", "foo", false);
+                    }
+
+//                    data.insert(3.1415);
 
                     agent.send("weather", data);
+                    agent.send("log", "executed " + tag + ".");
                 }
                 else if ("shutdown" == tag) {
                     std::ostringstream os;

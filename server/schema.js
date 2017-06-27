@@ -59,7 +59,9 @@ commands.monitor_test =
 commands.monitor =
 {
     send_data: {
-        name: "send data"
+        name: "weather report",
+        description: "Update and publish the weather report",
+        channel: "weather
     },
     ping: {
         name: "ping process",
@@ -116,7 +118,8 @@ channels.monitor =
         history: 100
     },
     weather: {
-        name: "weather report"
+        name: "weather report",
+        columns: [ "City", "State", "Temperature", "Comments", "City", "State", "Temperature", "Comments" ]
     }
 };
 
