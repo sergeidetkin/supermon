@@ -69,7 +69,7 @@ class EventSource extends EventEmitter
         const history = this.history(event);
 
         if (0 < history.length) {
-            if (snapshot) {
+            if (snapshot && 1 < history.length) {
                 f(history);
             }
             else {

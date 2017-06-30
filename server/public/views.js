@@ -18,6 +18,7 @@ class View
 {
     constructor(element) {
         this.element = element;
+        this.splitter = { h: null, v: null };
     }
 
     addEventListener(type, handler) {
@@ -30,6 +31,36 @@ class View
 
     dispatchEvent(event) {
         return this.element.dispatchEvent(event);
+    }
+
+    createHSplitter() {
+        if (null == this.splitter.h) {
+            var div = document.createElement('div');
+            div.classList.add('h-split');
+            div.style.position = 'absolute';
+            var r = this.element.getBoundingClientRect();
+            div.style.left = Math.ceil(r.left) + 'px';
+            div.style.top = (Math.floor(r.top) - 2) + 'px';
+            div.style.width = Math.floor(r.width) + 'px';
+            div.style.height = '4px';
+            this.element.appendChild(div);
+            this.splitter.h = div;
+        }
+    }
+
+    createVSplitter() {
+        if (null == this.splitter.v) {
+            var div = document.createElement('div');
+            div.classList.add('v-split');
+            div.style.position = 'absolute';
+            var r = this.element.getBoundingClientRect();
+            div.style.left = (Math.floor(r.right) - 2) + 'px';
+            div.style.width = '4px';
+            div.style.top = Math.ceil(r.top) + 'px';
+            div.style.height = Math.floor(r.height) + 'px';
+            this.element.appendChild(div);
+            this.splitter.v = div;
+        }
     }
 }
 

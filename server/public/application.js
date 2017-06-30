@@ -30,6 +30,12 @@ class Application
     constructor() {
         this.clients = {};
 
+//        var leftView = new View(document.querySelector('#left'));
+//        leftView.createVSplitter();
+//
+//        var inputView = new View(document.querySelector('#input'));
+//        inputView.createHSplitter();
+
         this.processListView = new ListView(document.querySelector('#proc-view'));
         this.processListView.addEventListener('change', this.onSelectedClientChanged.bind(this));
 
@@ -224,7 +230,7 @@ class Application
         if (-1 != e.selectedIndex) {
             id = this.processListView.element.children[e.selectedIndex].id;
             var client = this.clients[id];
-            status.textContent = client.name + '.' + client.instance;
+            status.textContent = client.name + '.' + client.instance + '@' + client.hostname;
             status.parentElement.style.display = '';
         }
         else {

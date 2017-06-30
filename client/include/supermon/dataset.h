@@ -38,7 +38,7 @@ namespace supermon
                                     std::is_same<bool, typename std::decay<T>::type>::value>::type
             add(T&& value)
             {
-                push_back
+                emplace_back
                 (
                     [value](std::ostream& os) -> std::ostream&
                     {
@@ -50,7 +50,7 @@ namespace supermon
 
             void add(const std::string& value)
             {
-                push_back
+                emplace_back
                 (
                     [value = boost::algorithm::replace_all_copy(value, "\"", "\\\"")](std::ostream& os) -> std::ostream&
                     {
@@ -62,7 +62,7 @@ namespace supermon
 
             void add(std::nullptr_t)
             {
-                push_back
+                emplace_back
                 (
                     [](std::ostream& os) -> std::ostream&
                     {

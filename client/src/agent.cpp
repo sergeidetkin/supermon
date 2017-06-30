@@ -258,6 +258,7 @@ namespace supermon
                     login.put("login.name", name);
                     login.put("login.instance", _config.instance);
                     login.put("login.pid", boost::this_process::get_id());
+                    login.put("login.hostname", boost::asio::ip::host_name());
                     login.put("login.timestamp", std::chrono::duration_cast<std::chrono::milliseconds>(_when.time_since_epoch()).count());
 
                     send(login);

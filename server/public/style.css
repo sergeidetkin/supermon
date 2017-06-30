@@ -247,6 +247,16 @@ div.section-header {
     background-color: slategray !important;
 }
 
+.v-split {
+    cursor: col-resize;
+    background-color: yellow;
+}
+
+.h-split {
+    cursor: row-resize;
+    background-color: yellow;
+}
+
 .dataset {
     position: relative;
     border-collapse: collapse;
@@ -260,13 +270,20 @@ div.section-header {
     /*font-family: 'Consolas', monospace;*/
     border-right: 1px solid rgb(160,160,160);
     border-bottom: 1px solid rgb(160,160,160);
+    cursor: cell;
 }
 
 .dataset thead tr td {
-    color: rgb(20, 20, 20);
+    /*color: rgb(20, 20, 20);*/
+    font-weight: bold;
+    background-color: #EEE;
+}
+
+.dataset tbody tr td:hover {
     background-color: #EEE;
 }
 
 .dataset tbody tr td:first-child {
+    text-align: right;
     background-color: #EEE;
 }

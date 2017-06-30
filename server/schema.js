@@ -61,7 +61,7 @@ commands.monitor =
     send_data: {
         name: "weather report",
         description: "Update and publish the weather report",
-        channel: "weather
+        channel: "weather"
     },
     ping: {
         name: "ping process",
@@ -106,7 +106,7 @@ var channels = {};
 channels.monitor =
 {
     log: {
-        name: "info",
+        name: "info (a.k.a. log)",
         history: 98
     },
     warning: {
@@ -119,7 +119,8 @@ channels.monitor =
     },
     weather: {
         name: "weather report",
-        columns: [ "City", "State", "Temperature", "Comments", "City", "State", "Temperature", "Comments" ]
+        columns: [ "City", "State", "Temperature", "Comments", "City", "State", "Temperature", "Comments" ],
+        history: 1
     }
 };
 
