@@ -40,9 +40,9 @@ class View
             div.style.position = 'absolute';
             var r = this.element.getBoundingClientRect();
             div.style.left = Math.ceil(r.left) + 'px';
-            div.style.top = (Math.floor(r.top) - 2) + 'px';
+            div.style.top = (Math.floor(r.bottom) - 4) + 'px';
             div.style.width = Math.floor(r.width) + 'px';
-            div.style.height = '4px';
+            div.style.height = '8px';
             this.element.appendChild(div);
             this.splitter.h = div;
         }
@@ -53,12 +53,39 @@ class View
             var div = document.createElement('div');
             div.classList.add('v-split');
             div.style.position = 'absolute';
-            var r = this.element.getBoundingClientRect();
-            div.style.left = (Math.floor(r.right) - 2) + 'px';
-            div.style.width = '4px';
-            div.style.top = Math.ceil(r.top) + 'px';
-            div.style.height = Math.floor(r.height) + 'px';
+
+            var onresize = function(e) {
+                var r = this.element.getBoundingClientRect();
+                div.style.left = (Math.floor(r.right) - 4) + 'px';
+                div.style.width = '8px';
+                div.style.top = Math.ceil(r.top) + 'px';
+                div.style.height = Math.floor(r.height) + 'px';
+            }.bind(this);
+
+            onresize();
+
+            window.addEventListener('resize', onresize);
             this.element.appendChild(div);
+
+            div.addEventListener('mousedown', function(e) {
+                var offset = { x: e.offsetX, y: e.offsetY };
+                var onmousemove = function(e) {
+                    var left = e.clientX - offset.x;
+                    div.style.left = left + 'px';
+                    div.parentElement.style.flexBasis = (left + 4) + 'px';
+                    e.preventDefault();
+                    e.stopPropagation();
+                };
+                var onmouseup = function(e) {
+                    document.removeEventListener('mousemove', onmousemove);
+                    document.removeEventListener('mouseup', onmouseup);
+                };
+                document.addEventListener('mouseup', onmouseup);
+                document.addEventListener('mousemove', onmousemove);
+                e.preventDefault();
+                e.stopPropagation();
+            });
+
             this.splitter.v = div;
         }
     }

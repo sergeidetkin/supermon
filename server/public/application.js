@@ -30,11 +30,11 @@ class Application
     constructor() {
         this.clients = {};
 
-//        var leftView = new View(document.querySelector('#left'));
-//        leftView.createVSplitter();
-//
-//        var inputView = new View(document.querySelector('#input'));
-//        inputView.createHSplitter();
+        var leftView = new View(document.querySelector('#left'));
+        leftView.createVSplitter();
+
+        //var inputView = new View(document.querySelector('#input'));
+        //inputView.createHSplitter();
 
         this.processListView = new ListView(document.querySelector('#proc-view'));
         this.processListView.addEventListener('change', this.onSelectedClientChanged.bind(this));

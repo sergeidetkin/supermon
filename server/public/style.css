@@ -218,6 +218,9 @@ div.section-header {
 
 #commands > .list-view > .item {
     padding-left: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #channel-view > .item {
@@ -249,12 +252,14 @@ div.section-header {
 
 .v-split {
     cursor: col-resize;
-    background-color: yellow;
+    /*background-color: rgba(200,200,0,0.5);*/
+    z-index: 1;
 }
 
 .h-split {
     cursor: row-resize;
-    background-color: yellow;
+    background-color: rgba(200,200,0,0.5);
+    z-index: 1;
 }
 
 .dataset {
