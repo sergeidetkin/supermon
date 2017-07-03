@@ -38,12 +38,45 @@ class View
             var div = document.createElement('div');
             div.classList.add('h-split');
             div.style.position = 'absolute';
-            var r = this.element.getBoundingClientRect();
-            div.style.left = Math.ceil(r.left) + 'px';
-            div.style.top = (Math.floor(r.bottom) - 4) + 'px';
-            div.style.width = Math.floor(r.width) + 'px';
-            div.style.height = '8px';
+
+            var onresize = function(e) {
+                var r = this.element.getBoundingClientRect();
+                div.style.left = Math.ceil(r.left) + 'px';
+                div.style.top = (Math.floor(r.bottom) - 4) + 'px';
+                div.style.width = Math.floor(r.width) + 'px';
+                div.style.height = '8px';
+            }.bind(this);
+
+            onresize();
+
+            window.addEventListener('resize', onresize);
+            window.addEventListener('split', onresize);
             this.element.appendChild(div);
+
+            div.addEventListener('mousedown', function(e) {
+                var parentOffsetY = div.parentElement.getBoundingClientRect().top;
+                var offset = { x: e.offsetX, y: e.offsetY };
+                var onmousemove = function(e) {
+                    document.body.style.cursor = 'row-resize';
+                    var y = e.clientY - offset.y;
+                    div.style.top = y + 'px';
+                    div.parentElement.style.flexBasis = (y - parentOffsetY + 4) + 'px';
+                    //console.log(y + 4, div.parentElement.offsetHeight);
+                    e.preventDefault();
+                    e.stopPropagation();
+                };
+                var onmouseup = function(e) {
+                    window.removeEventListener('mousemove', onmousemove);
+                    window.removeEventListener('mouseup', onmouseup);
+                    document.body.style.cursor = '';
+                    onresize();
+                };
+                window.addEventListener('mouseup', onmouseup);
+                window.addEventListener('mousemove', onmousemove);
+                e.preventDefault();
+                e.stopPropagation();
+            });
+
             this.splitter.h = div;
         }
     }
@@ -70,15 +103,19 @@ class View
             div.addEventListener('mousedown', function(e) {
                 var offset = { x: e.offsetX, y: e.offsetY };
                 var onmousemove = function(e) {
-                    var left = e.clientX - offset.x;
-                    div.style.left = left + 'px';
-                    div.parentElement.style.flexBasis = (left + 4) + 'px';
+                    document.body.style.cursor = 'col-resize';
+                    var x = e.clientX - offset.x;
+                    div.style.left = x + 'px';
+                    div.parentElement.style.flexBasis = (x + 4) + 'px';
                     e.preventDefault();
                     e.stopPropagation();
                 };
                 var onmouseup = function(e) {
                     document.removeEventListener('mousemove', onmousemove);
                     document.removeEventListener('mouseup', onmouseup);
+                    document.body.style.cursor = '';
+                    window.dispatchEvent(new Event('split'));
+                    onresize();
                 };
                 document.addEventListener('mouseup', onmouseup);
                 document.addEventListener('mousemove', onmousemove);
@@ -117,7 +154,7 @@ class TableView extends View
 
     set data(src) {
         var table = this.element.createTBody();
-        for (var r = 0; r < src.length; ++r) {
+        for (var r = 1000 < src.length ? src.length - 1000 : 0; r < src.length; ++r) {
             var row = table.insertRow();
             var cell = row.insertCell();
             cell.textContent = r + 1;

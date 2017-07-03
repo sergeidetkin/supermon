@@ -109,8 +109,6 @@ int main(int argc, char* argv[])
                         data.insert(true, std::to_string(timestamp), "blah", tag, "London", "UK", "foo", false);
                     }
 
-//                    data.insert(3.1415);
-
                     agent.send("weather", data);
                     agent.send("log", "executed " + tag + ".");
                 }

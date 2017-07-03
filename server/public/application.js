@@ -33,8 +33,8 @@ class Application
         var leftView = new View(document.querySelector('#left'));
         leftView.createVSplitter();
 
-        //var inputView = new View(document.querySelector('#input'));
-        //inputView.createHSplitter();
+        var inputView = new View(document.querySelector('#input'));
+        inputView.createHSplitter();
 
         this.processListView = new ListView(document.querySelector('#proc-view'));
         this.processListView.addEventListener('change', this.onSelectedClientChanged.bind(this));
@@ -102,6 +102,7 @@ class Application
 
     createInputForm(command) {
         var form = document.createElement('div');
+        form.setAttribute('id', 'form');
 
         var div = document.createElement('div');
         div.textContent = command.description || command.name;
@@ -189,19 +190,20 @@ class Application
     }
 
     updateInputView(commandId, target) {
-        var element = document.querySelector('#input');
-        if (element.firstElementChild) {
-            element.removeChild(element.firstElementChild);
+        var input = document.querySelector('#input');
+        var form = input.querySelector('#form');
+        if (form) {
+            input.removeChild(form);
         }
         if (null == commandId || null == target) {
             return;
         }
         var command = target.commands[commandId];
         //console.log('->', target.name, command.name);
-        var form = this.createInputForm(command);
+        form = this.createInputForm(command);
         var execute = form.querySelector('#execute');
         execute.addEventListener('click', this.submitCommand.bind(this, commandId, target));
-        element.appendChild(form);
+        input.appendChild(form);
     }
 
     onSelectedCommandChanged(e) {
@@ -214,14 +216,18 @@ class Application
             target = this.commandsListView.element.children[e.selectedIndex].target;
             status.textContent = target.commands[commandId].name;
             status.parentElement.style.display = '';
-            input.style.display = '';
+            input.style.flexBasis = 'auto';
+            //input.style.display = '';
         }
         else {
             status.textContent = '';
             status.parentElement.style.display = 'none';
-            input.style.display = 'none';
+            //input.style.display = 'none';
         }
         this.updateInputView(commandId, target);
+        window.setTimeout(function() {
+            window.dispatchEvent(new Event('split'));
+        });
     }
 
     onSelectedClientChanged(e) {
