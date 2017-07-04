@@ -160,7 +160,11 @@ class TableView extends View
             cell.textContent = r + 1;
             for (var c = 0; c < src[r].length; ++c) {
                 cell = row.insertCell();
-                cell.textContent = src[r][c];
+                var value = src[r][c];
+                cell.textContent = value;
+                if (null == value) {
+                    //cell.style.backgroundColor = '#feffdd';
+                }
             }
         }
     }

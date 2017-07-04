@@ -117,6 +117,11 @@ namespace supermon
         }
     }
 
+    boost::asio::io_service& agent::io_service()
+    {
+        return _io;
+    }
+
     void agent::dispatch(std::shared_ptr<boost::asio::streambuf> streambuf)
     {
         std::istream is(&*streambuf);

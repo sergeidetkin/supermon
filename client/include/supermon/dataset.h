@@ -78,6 +78,13 @@ namespace supermon
                 int dummy[sizeof...(ARGS)] = { (add(args), 0)... };
                 (void)dummy;
             }
+
+            template<typename T>
+            friend row& operator << (row& r, T&& v)
+            {
+                r.add(std::forward<T>(v));
+                return r;
+            }
         };
 
     public:

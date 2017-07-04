@@ -28,6 +28,7 @@ body {
     flex: 0 0 30ch;
     /*background-color: rgb(225,229,234);*/
     border-right: 1px solid rgb(160,160,160);
+    /*border-right: 1px solid #0C0;*/
 }
 
 div.section-header {
@@ -43,12 +44,14 @@ div.section-header {
     /*font-weight: bold;*/
     /*border-bottom: 1px solid rgb(160,160,160);*/
     min-height: 1em;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #input {
     flex: 0 0 auto;
-    border-bottom: 1px solid rgb(160,160,160);
     min-height: 16px;
+    border-bottom: 1px solid rgb(160,160,160);
 }
 
 #input table {
@@ -111,7 +114,7 @@ div.section-header {
 
 #apps {
     flex: 4;
-    border-bottom: 1px solid rgb(160,160,160);
+    /*border-bottom: 1px solid rgb(160,160,160);*/
 }
 
 #commands {
@@ -155,6 +158,8 @@ div.section-header {
 
 .list-view > .item > .label {
     color: inherit;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .list-view > .item .lvi-caption {

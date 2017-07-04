@@ -107,6 +107,8 @@ int main(int argc, char* argv[])
                     for (size_t n = 0; n < 10; ++n) {
                         data.insert(std::to_string(timestamp), "foo", nullptr, false, "New York", "NY", "blah", "bar");
                         data.insert(true, std::to_string(timestamp), "blah", tag, "London", "UK", "foo", false);
+                        supermon::dataset::row& r = data.insertRow();
+                        r << "12:30" << 2 << true << 4 << nullptr << false << 7 << 8.0;
                     }
 
                     agent.send("weather", data);

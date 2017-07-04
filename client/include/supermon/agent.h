@@ -61,13 +61,15 @@ namespace supermon
         void connect();
         void shutdown();
 
+        boost::asio::io_service& io_service();
+
     public:
         void send(const std::string& channel, const std::string& message);
         void send(const std::string& channel, const dataset& data);
         void alert(const std::string& text);
         void info(const std::string& text);
 
-    protected:
+    private:
         void init();
         void listen(std::shared_ptr<boost::asio::streambuf> buffer = nullptr);
         void retry(std::chrono::seconds interval = std::chrono::seconds(5));

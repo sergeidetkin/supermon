@@ -119,8 +119,7 @@ channels.monitor =
     },
     weather: {
         name: "weather report",
-        columns: [ "City", "State", "Temperature", "Comments", "City", "State", "Temperature", "Comments" ],
-        history: 1
+        columns: [ "City", "State", "Temperature", "Comments", "City", "State", "Temperature", "Comments" ]
     }
 };
 
