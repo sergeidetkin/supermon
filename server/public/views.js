@@ -66,17 +66,17 @@ class View
                     e.stopPropagation();
                 };
                 var onmouseup = function(e) {
-                    document.removeEventListener('mousemove', onmousemove);
-                    document.removeEventListener('mouseup', onmouseup);
+                    document.removeEventListener('mousemove', onmousemove, true);
+                    document.removeEventListener('mouseup', onmouseup, true);
                     document.body.style.cursor = '';
                     onresize();
                 };
                 document.body.style.cursor = 'row-resize';
-                document.addEventListener('mouseup', onmouseup);
-                document.addEventListener('mousemove', onmousemove);
+                document.addEventListener('mouseup', onmouseup, true);
+                document.addEventListener('mousemove', onmousemove, true);
                 e.preventDefault();
                 e.stopPropagation();
-            });
+            }, true);
 
             this.splitter.h = div;
         }
@@ -112,18 +112,18 @@ class View
                     e.stopPropagation();
                 };
                 var onmouseup = function(e) {
-                    document.removeEventListener('mousemove', onmousemove);
-                    document.removeEventListener('mouseup', onmouseup);
+                    document.removeEventListener('mousemove', onmousemove, true);
+                    document.removeEventListener('mouseup', onmouseup, true);
                     document.body.style.cursor = '';
                     window.dispatchEvent(new Event('split'));
                     onresize();
                 };
                 document.body.style.cursor = 'col-resize';
-                document.addEventListener('mouseup', onmouseup);
-                document.addEventListener('mousemove', onmousemove);
+                document.addEventListener('mouseup', onmouseup, true);
+                document.addEventListener('mousemove', onmousemove, true);
                 e.preventDefault();
                 e.stopPropagation();
-            });
+            }, true);
 
             this.splitter.v = div;
         }

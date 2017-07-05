@@ -36,8 +36,8 @@ class Application
         var inputView = new View(document.querySelector('#input'));
         inputView.createHSplitter();
 
-        var inputView = new View(document.querySelector('#apps'));
-        inputView.createHSplitter({offset:0, size: '1em'});
+        var appsView = new View(document.querySelector('#apps'));
+        appsView.createHSplitter({offset:0, size: '1em'});
 
         this.processListView = new ListView(document.querySelector('#proc-view'));
         this.processListView.addEventListener('change', this.onSelectedClientChanged.bind(this));
