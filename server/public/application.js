@@ -19,7 +19,7 @@ Date.prototype.strtime = function() {
            + ('00' + this.getMinutes()).slice(-2) + ':'
            + ('00' + this.getSeconds()).slice(-2) + '.'
            + ('000' + this.getMilliseconds()).slice(-3);
-}
+};
 
 function identify(client) {
     return (client.name + '-' + client.instance).replace(/\W/g, '-');
@@ -35,6 +35,9 @@ class Application
 
         var inputView = new View(document.querySelector('#input'));
         inputView.createHSplitter();
+
+        var inputView = new View(document.querySelector('#apps'));
+        inputView.createHSplitter({offset:0, size: '1em'});
 
         this.processListView = new ListView(document.querySelector('#proc-view'));
         this.processListView.addEventListener('change', this.onSelectedClientChanged.bind(this));

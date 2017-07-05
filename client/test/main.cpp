@@ -100,13 +100,15 @@ int main(int argc, char* argv[])
                 else if ("send_data" == tag)
                 {
                     agent.send("log", "executing " + tag + "...");
+                    std::chrono::microseconds now = std::chrono::system_clock::now().time_since_epoch();
                     auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
                     supermon::dataset data;
 
                     for (size_t n = 0; n < 10; ++n) {
-                        data.insert(std::to_string(timestamp), "foo", nullptr, false, "New York", "NY", "blah", "bar");
+                        data.insert(std::to_string(now.count()), "foo", nullptr, false, "New York", "NY", "blah", "bar");
                         data.insert(true, std::to_string(timestamp), "blah", tag, "London", "UK", "foo", false);
+                        // or
                         supermon::dataset::row& r = data.insertRow();
                         r << "12:30" << 2 << true << 4 << nullptr << false << 7 << 8.0;
                     }

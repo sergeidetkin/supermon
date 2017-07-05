@@ -33,7 +33,8 @@ class View
         return this.element.dispatchEvent(event);
     }
 
-    createHSplitter() {
+    createHSplitter(options) {
+        var config = options || { offset: 4, size: '8px' };
         if (null == this.splitter.h) {
             var div = document.createElement('div');
             div.classList.add('h-split');
@@ -42,37 +43,37 @@ class View
             var onresize = function(e) {
                 var r = this.element.getBoundingClientRect();
                 div.style.left = Math.ceil(r.left) + 'px';
-                div.style.top = (Math.floor(r.bottom) - 4) + 'px';
+                div.style.top = (Math.floor(r.bottom) - config.offset) + 'px';
                 div.style.width = Math.floor(r.width) + 'px';
-                div.style.height = '8px';
+                div.style.height = config.size;
             }.bind(this);
 
             onresize();
 
             window.addEventListener('resize', onresize);
             window.addEventListener('split', onresize);
+
             this.element.appendChild(div);
 
             div.addEventListener('mousedown', function(e) {
                 var parentOffsetY = div.parentElement.getBoundingClientRect().top;
                 var offset = { x: e.offsetX, y: e.offsetY };
                 var onmousemove = function(e) {
-                    document.body.style.cursor = 'row-resize';
                     var y = e.clientY - offset.y;
                     div.style.top = y + 'px';
-                    div.parentElement.style.flexBasis = (y - parentOffsetY + 4) + 'px';
-                    //console.log(y + 4, div.parentElement.offsetHeight);
+                    div.parentElement.style.flexBasis = (y - parentOffsetY + config.offset) + 'px';
                     e.preventDefault();
                     e.stopPropagation();
                 };
                 var onmouseup = function(e) {
-                    window.removeEventListener('mousemove', onmousemove);
-                    window.removeEventListener('mouseup', onmouseup);
+                    document.removeEventListener('mousemove', onmousemove);
+                    document.removeEventListener('mouseup', onmouseup);
                     document.body.style.cursor = '';
                     onresize();
                 };
-                window.addEventListener('mouseup', onmouseup);
-                window.addEventListener('mousemove', onmousemove);
+                document.body.style.cursor = 'row-resize';
+                document.addEventListener('mouseup', onmouseup);
+                document.addEventListener('mousemove', onmousemove);
                 e.preventDefault();
                 e.stopPropagation();
             });
@@ -98,12 +99,12 @@ class View
             onresize();
 
             window.addEventListener('resize', onresize);
+
             this.element.appendChild(div);
 
             div.addEventListener('mousedown', function(e) {
                 var offset = { x: e.offsetX, y: e.offsetY };
                 var onmousemove = function(e) {
-                    document.body.style.cursor = 'col-resize';
                     var x = e.clientX - offset.x;
                     div.style.left = x + 'px';
                     div.parentElement.style.flexBasis = (x + 4) + 'px';
@@ -117,6 +118,7 @@ class View
                     window.dispatchEvent(new Event('split'));
                     onresize();
                 };
+                document.body.style.cursor = 'col-resize';
                 document.addEventListener('mouseup', onmouseup);
                 document.addEventListener('mousemove', onmousemove);
                 e.preventDefault();
@@ -163,7 +165,7 @@ class TableView extends View
                 var value = src[r][c];
                 cell.textContent = value;
                 if (null == value) {
-                    //cell.style.backgroundColor = '#feffdd';
+                    cell.classList.add('null');
                 }
             }
         }
@@ -364,11 +366,17 @@ class ListView extends View
         if (1 != this.maxCount && -1 == this.selectedIndex && this.autoScroll) {
             item.element.scrollIntoView({behavior: 'instant'});
         }
+        window.setTimeout(function() {
+            window.dispatchEvent(new Event('split'));
+        });
     }
 
     clear() {
         this.selectedIndex = -1;
         this.element.innerHTML = '';
+        window.setTimeout(function() {
+            window.dispatchEvent(new Event('split'));
+        });
     }
 
     onItemClick(e) {

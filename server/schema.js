@@ -102,11 +102,10 @@ commands.monitor =
 
 var channels = {};
 
-
 channels.monitor =
 {
     log: {
-        name: "info (a.k.a. log)",
+        name: "info (log)",
         history: 98
     },
     warning: {
@@ -119,7 +118,7 @@ channels.monitor =
     },
     weather: {
         name: "weather report",
-        columns: [ "City", "State", "Temperature", "Comments", "City", "State", "Temperature", "Comments" ]
+        columns: [ "City", "State", "Temperature", "Comments", "City 2", "State 2", "Temperature 2", "Comments 2" ]
     }
 };
 

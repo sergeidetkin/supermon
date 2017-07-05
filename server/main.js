@@ -185,7 +185,9 @@ class ApiMessageHandler extends MessageHandler
             const hub = channels[this.clientId];
             for (let topic in login.channels) {
                 //console.log(login.channels[topic].history);
-                hub[topic] = new EventSource({ history: login.channels[topic].hasOwnProperty('columns') ? 1 : login.channels[topic].history });
+                hub[topic] = new EventSource({
+                    history: login.channels[topic].hasOwnProperty('columns') ? 1 : login.channels[topic].history
+                });
             }
         }
 
