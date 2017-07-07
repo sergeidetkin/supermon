@@ -58,9 +58,14 @@ commands.monitor_test =
 
 commands.monitor =
 {
-    send_data: {
+    publish_weather_report: {
         name: "weather report",
         description: "Update and publish the weather report",
+        channel: "weather"
+    },
+    get_weather_private: {
+        name: "get private weather report",
+        description: "Update and send the weather report to this instance only",
         channel: "weather"
     },
     ping: {

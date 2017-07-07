@@ -42,13 +42,16 @@ namespace supermon
         std::uint16_t port = 8080;
     };
 
+    using ptree_t = boost::property_tree::ptree;
+    using ptree_ptr_t = std::shared_ptr<ptree_t>;
+
     namespace callback
     {
         using abort      = std::function<void (std::exception_ptr)>;
         using error      = std::function<void (const std::runtime_error&)>;
         using connect    = std::function<void ()>;
         using disconnect = std::function<void (const std::runtime_error&)>;
-        using message    = std::function<void (const std::string&, const std::shared_ptr<boost::property_tree::ptree>&)>;
+        using message    = std::function<void (const std::string& tag, const ptree_ptr_t& head, const ptree_ptr_t& body)>;
     }
 
     class agent final
@@ -64,8 +67,8 @@ namespace supermon
         boost::asio::io_service& io_service();
 
     public:
-        void send(const std::string& channel, const std::string& message);
-        void send(const std::string& channel, const dataset& data);
+        void send(const std::string& channel, const std::string& message, long port = 0);
+        void send(const std::string& channel, const dataset& data, long port = 0);
         void alert(const std::string& text);
         void info(const std::string& text);
 

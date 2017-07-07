@@ -36,9 +36,8 @@ class EventSource extends EventEmitter
         this.cache_max = options.history || 0;
     }
 
-    notify() {
+    notify(type, event) {
         if (0 < this.cache_max) {
-            const type = arguments[0];
             if (undefined == this.cache[type]) {
                 this.cache[type] = [];
             }
@@ -46,7 +45,7 @@ class EventSource extends EventEmitter
             while (history.length >= this.cache_max) {
                 history.shift();
             }
-            history.push(arguments[1]);
+            history.push(event);
         }
         this.emit.apply(this, arguments);
     }
@@ -62,28 +61,43 @@ class EventSource extends EventEmitter
     }
 
     // need this to be able get the stable handler reference to unsubscribe later
-    subscribe(event, target, handler, snapshot) {
-        let f = handler.bind(target);
-        target['on'+event] = f;
+    subscribe(type, target, method, snapshot) {
+        let handler = null;
 
-        const history = this.history(event);
+        if (null != target) {
+            handler = method.bind(target);
+            target['on' + type.split('_')[0]] = handler;
+        }
+        else {
+            handler = method;
+        }
+
+        const history = this.history(type);
 
         if (0 < history.length) {
             if (snapshot && 1 < history.length) {
-                f(history);
+                handler(history);
             }
             else {
                 history.forEach((e) => {
-                    f(e);
+                    handler(e);
                 });
             }
         }
 
-        this.on(event, f);
+        this.on(type, handler);
     }
 
-    unsubscribe(event, handler) {
-        this.removeListener(event, handler);
+    unsubscribe(type, handler) {
+        this.removeListener(type, handler);
+
+        // delete private event history, if any
+        if (-1 != type.indexOf('_')) {
+            if (undefined != this.cache[type]) {
+                this.cache[type].length = 0;
+                delete this.cache[type];
+            }
+        }
     }
 }
 
@@ -93,6 +107,12 @@ const api = new EventSource();
 class MessageHandler
 {
     constructor(socket) {
+        if (!MessageHandler.hasOwnProperty('_counter')) {
+            MessageHandler._counter = 0;
+        }
+
+        this._id = ++MessageHandler._counter;
+
         socket.on('message', (message) => { this.onmessage(socket, message); });
         socket.on('close', (code, reason) => { this.onclose(socket, code, reason); });
         socket.on('error', (error) => { this.onerror(error); });
@@ -109,13 +129,19 @@ class MessageHandler
         this.connected = true;
     }
 
+    get id() {
+        return this._id;
+    }
+
     onmessage(socket, buffer) {
         try {
             const message = JSON.parse(buffer);
             const id = Object.keys(message)[0];
             if ('function' == typeof(this['on'+id])) {
                 // timestamp the incoming message
-                message[id].when = Date.now();
+                if (!message[id].hasOwnProperty('when')) {
+                    message[id].when = Date.now();
+                }
                 this['on'+id](message[id]);
             }
             else {
@@ -205,8 +231,11 @@ class ApiMessageHandler extends MessageHandler
         if (channel) {
             const client = clients[this.clientId];
 
-            channel.notify('update', {
+            let topic = 'update' + ((0 < message.port) ? ('_' + message.port) : '');
+
+            channel.notify(topic, {
                 channel: message.channel,
+                port: message.port,
                 event: message.event,
                 source: {
                     name: client.name,
@@ -235,8 +264,17 @@ class ApiMessageHandler extends MessageHandler
 
     oncommand(event) {
         if (this.clientId != event.clientId) return;
+
         const message = {};
-        message[event.id] = event.arguments;
+
+        message[event.id] = {
+            head: {
+                port: event.port,
+                when: event.when
+            },
+            body: event.arguments
+        };
+
         this.send(message);
     }
 
@@ -253,17 +291,24 @@ class UserMessageHandler extends MessageHandler
 
         this.topic = null;
 
+        this.onupdate = this.onupdate.bind(this);
+
         user.subscribe('login', this, this.onlogin);
         user.subscribe('status', this, this.onstatus);
 
-        const message = { "snapshot" : clients };
+        const message = { 'snapshot' : clients };
         this.send(message);
+    }
+
+    get connection() {
+        return channels[this.topic.name + '.' + this.topic.instance][this.topic.channel];
     }
 
     onunsubscribe() {
         //console.log('unsubscribe');
         if (null != this.topic) {
-            channels[this.topic.name + '.' + this.topic.instance][this.topic.channel].unsubscribe('update', this.onupdate);
+            this.connection.unsubscribe('update_' + this.id, this.onupdate);
+            this.connection.unsubscribe('update', this.onupdate);
             this.topic = null;
         }
     }
@@ -274,16 +319,19 @@ class UserMessageHandler extends MessageHandler
             if (this.topic.channel != message.channel || this.topic.instance != message.instance || this.topic.name != message.name) {
                 this.onunsubscribe();
                 this.topic = message;
-                channels[this.topic.name + '.' + this.topic.instance][this.topic.channel].subscribe('update', this, this.onupdate, true);
+                this.connection.subscribe('update', null, this.onupdate, true);
+                this.connection.subscribe('update_' + this.id, null, this.onupdate, true);
             }
         }
         else {
             this.topic = message;
-            channels[this.topic.name + '.' + this.topic.instance][this.topic.channel].subscribe('update', this, this.onupdate, true);
+            this.connection.subscribe('update', null, this.onupdate, true);
+            this.connection.subscribe('update_' + this.id, null, this.onupdate, true);
         }
     }
 
     oncommand(message) {
+        message.port = this.id;
         api.notify('command', message);
     }
 

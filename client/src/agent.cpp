@@ -129,9 +129,21 @@ namespace supermon
         try
         {
             boost::property_tree::read_json(is, *message);
-            auto body = std::shared_ptr<boost::property_tree::ptree>(message, &message->begin()->second);
 
-            if (onmessage) onmessage(message->begin()->first, body);
+            const auto& tag = message->begin()->first;
+            auto& root = message->begin()->second;
+
+            // achtung! aliasing constructor
+            auto head = std::shared_ptr<boost::property_tree::ptree>(message, &root.get_child("head"));
+            auto body = std::shared_ptr<boost::property_tree::ptree>(message, &root.get_child("body"));
+
+//            auto when = head->get<long>("when");
+//            timespec t = { .tv_sec = when / 1000, .tv_nsec = (when % 1000) }; // using tv_nsec to store milliseconds
+//
+//            std::cout << std::put_time(std::localtime(&t.tv_sec), "%T.") << std::setfill('0') << std::setw(3) << t.tv_nsec << " : ";
+//            boost::property_tree::write_json(std::cout, *head, true);
+
+            if (onmessage) onmessage(tag, head, body);
         }
         catch (const std::exception& e)
         {
@@ -201,15 +213,17 @@ namespace supermon
         }
     }
 
-    void agent::send(const std::string& channel, const dataset& data)
+    void agent::send(const std::string& channel, const dataset& data, long port)
     {
         try
         {
             boost::asio::streambuf buffer;
             std::ostream os(&buffer);
-            os << R"({"push":{"channel":")" << channel << R"(","event":{"data":)";
-            os << data;
-            os << "}}}";
+            os << "{\"push\":{"
+               << "\"channel\":\"" << channel << "\","
+               << "\"port\":\"" << port << "\","
+               << "\"event\":{\"data\":" << data
+               << "}}}";
             _websocket.write(buffer.data());
         }
         catch (const std::exception& e)
@@ -218,10 +232,11 @@ namespace supermon
         }
     }
 
-    void agent::send(const std::string& channel, const std::string& text)
+    void agent::send(const std::string& channel, const std::string& text, long port)
     {
         boost::property_tree::ptree msg;
         msg.put("push.channel", channel);
+        msg.put("push.port", port);
         msg.put("push.event.text", text);
         send(msg);
     }

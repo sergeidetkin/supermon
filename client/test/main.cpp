@@ -88,33 +88,45 @@ int main(int argc, char* argv[])
             });
         };
 
-        agent.onmessage = [&io, &agent](const std::string& tag, const std::shared_ptr<boost::property_tree::ptree>& request)
+        agent.onmessage = [&io, &agent](const std::string& tag, const supermon::ptree_ptr_t& head, const supermon::ptree_ptr_t& request)
         {
-            io.post([&io, &agent, tag, request]()
+            io.post([&io, &agent, tag, head, request]()
             {
                 if ("send_alert" == tag) {
                     std::string text = request->get<std::string>("text");
                     agent.alert(text);
                     agent.send("warning", "raised alert '" + text + "'");
                 }
-                else if ("send_data" == tag)
+                else if ("publish_weather_report" == tag)
                 {
                     agent.send("log", "executing " + tag + "...");
                     std::chrono::microseconds now = std::chrono::system_clock::now().time_since_epoch();
-                    auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+                    std::chrono::milliseconds timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(now);
 
                     supermon::dataset data;
 
                     for (size_t n = 0; n < 10; ++n) {
                         data.insert(std::to_string(now.count()), "foo", nullptr, false, "New York", "NY", "blah", "bar");
-                        data.insert(true, std::to_string(timestamp), "blah", tag, "London", "UK", "foo", false);
+                        data.insert(true, std::to_string(timestamp.count()), "blah", tag, "London", "UK", "foo", false);
                         // or
                         supermon::dataset::row& r = data.insertRow();
                         r << "12:30" << 2 << true << 4 << nullptr << false << 7 << 8.0;
                     }
 
                     agent.send("weather", data);
-                    agent.send("log", "executed " + tag + ".");
+                    //agent.send("log", "executed " + tag + ".");
+                }
+                else if ("get_weather_private" == tag)
+                {
+                    agent.send("log", "executing " + tag + "...");
+                    supermon::dataset data;
+
+                    for (size_t n = 0; n < 10; ++n) {
+                        supermon::dataset::row& r = data.insertRow();
+                        r << "12:30" << head->get<long>("port") << 3 << 4 << nullptr << false << 7 << 8.0;
+                    }
+
+                    agent.send("weather", data, head->get<long>("port"));
                 }
                 else if ("shutdown" == tag) {
                     std::ostringstream os;
