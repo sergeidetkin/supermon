@@ -5,9 +5,9 @@ TARGET := monitor_test
 build ?= $(if $(debug),debug,release)
 build.dir ?= build/$(build)
 
-boost.dir := $(HOME)/src/boost-1.65
+boost.dir := $(HOME)/src/boost-1.64
 boost.dir.include := $(boost.dir)
-boost.dir.lib := $(boost.dir)/bin.v2/libs
+boost.dir.lib := $(boost.dir)/stage/lib
 
 boost.libs := program_options system
 
@@ -15,7 +15,7 @@ beast.dir := $(HOME)/src/Beast
 beast.dir.include := $(beast.dir)/include
 
 CXX ?= g++
-CXXFLAGS += -std=c++1y $(if $(build:debug=),-O3,-g -O0)
+CXXFLAGS += -std=c++14 $(if $(build:debug=),-O3,-g -O0)
 CPPFLAGS += -I../include -I$(beast.dir.include) -isystem$(boost.dir.include) 
 DEPFLAGS = -MMD -MP -MT $@ -MF $(basename $@).d
 LDFLAGS += $(if $(build:debug=),,-g) -L$(boost.dir.lib)
