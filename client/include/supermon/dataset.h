@@ -80,7 +80,14 @@ namespace supermon
             }
 
             template<typename T>
-            friend row& operator << (row& r, T&& v)
+            row& operator += (T&& v)
+            {
+                add(std::forward<T>(v));
+                return *this;
+            }
+
+            template<typename T>
+            friend row& operator , (row& r, T&& v)
             {
                 r.add(std::forward<T>(v));
                 return r;

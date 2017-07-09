@@ -16,11 +16,13 @@
 
 const fs = require('fs');
 const path = require('path');
+const util = require('util');
+
 const HTTP = require('http');
 const WebSocket = require('ws');
 const EventEmitter = require('events');
+
 const schema = require('./schema');
-const util = require('util');
 const config = require('./config');
 
 const clients = {};
@@ -141,6 +143,9 @@ class MessageHandler
                 // timestamp the incoming message
                 if (!message[id].hasOwnProperty('when')) {
                     message[id].when = Date.now();
+                }
+                else {
+                    message[id].when = parseInt(message[id].when);
                 }
                 this['on'+id](message[id]);
             }

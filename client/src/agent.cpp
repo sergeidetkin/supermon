@@ -213,6 +213,13 @@ namespace supermon
         }
     }
 
+    template<typename T = std::chrono::milliseconds>
+    long long timestamp()
+    {
+        std::chrono::microseconds now = std::chrono::system_clock::now().time_since_epoch();
+        return std::chrono::duration_cast<T>(now).count();
+    }
+
     void agent::send(const std::string& channel, const dataset& data, long port)
     {
         try
@@ -220,6 +227,7 @@ namespace supermon
             boost::asio::streambuf buffer;
             std::ostream os(&buffer);
             os << "{\"push\":{"
+               << "\"when\":\"" << timestamp() << "\","
                << "\"channel\":\"" << channel << "\","
                << "\"port\":\"" << port << "\","
                << "\"event\":{\"data\":" << data
@@ -237,6 +245,7 @@ namespace supermon
         boost::property_tree::ptree msg;
         msg.put("push.channel", channel);
         msg.put("push.port", port);
+        msg.put("push.when", timestamp());
         msg.put("push.event.text", text);
         send(msg);
     }
@@ -245,6 +254,7 @@ namespace supermon
     {
         boost::property_tree::ptree msg;
         msg.put("status.type", "alert");
+        msg.put("status.when", timestamp());
         msg.put("status.text", text);
         send(msg);
     }
@@ -253,6 +263,7 @@ namespace supermon
     {
         boost::property_tree::ptree msg;
         msg.put("status.type", "info");
+        msg.put("status.when", timestamp());
         msg.put("status.text", text);
         send(msg);
     }
@@ -279,6 +290,7 @@ namespace supermon
                     login.put("login.instance", _config.instance);
                     login.put("login.pid", boost::this_process::get_id());
                     login.put("login.hostname", boost::asio::ip::host_name());
+                    login.put("login.when", timestamp());
                     login.put("login.timestamp", std::chrono::duration_cast<std::chrono::milliseconds>(_when.time_since_epoch()).count());
 
                     send(login);

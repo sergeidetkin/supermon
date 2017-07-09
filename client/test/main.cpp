@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
                         data.insert(true, std::to_string(timestamp.count()), "blah", tag, "London", "UK", "foo", false);
                         // or
                         supermon::dataset::row& r = data.insertRow();
-                        r << "12:30" << 2 << true << 4 << nullptr << false << 7 << 8.0;
+                        r += "12:30", 2, true, 4, nullptr, false, 7, 8.0;
                     }
 
                     agent.send("weather", data);
@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
 
                     for (size_t n = 0; n < 10; ++n) {
                         supermon::dataset::row& r = data.insertRow();
-                        r << "12:30" << head->get<long>("port") << 3 << 4 << nullptr << false << 7 << 8.0;
+                        r += "12:30", head->get<long>("port"), 3, 4, nullptr, false, 7, 8.0;
                     }
 
                     agent.send("weather", data, head->get<long>("port"));
@@ -151,7 +151,8 @@ int main(int argc, char* argv[])
         boost::asio::system_timer timer(io);
 
         bool flag = true;
-        std::function<void(const boost::system::error_code&)> tick = [&timer, &agent, &tick, &flag](const boost::system::error_code& error) mutable
+
+        std::function<void(const boost::system::error_code&)> tick = [&](const boost::system::error_code& error)
         {
             if (error != boost::asio::error::operation_aborted)
             {
@@ -175,7 +176,7 @@ int main(int argc, char* argv[])
         };
 
         timer.expires_from_now(std::chrono::milliseconds(5000));
-        //timer.async_wait(tick);
+        timer.async_wait(tick);
 
         io.run();
 
