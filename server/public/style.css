@@ -254,7 +254,7 @@ div.section-header {
 
 #channel-view > .item {
     font-size: 10pt;
-    font-family: 'Consolas', monospace;
+    font-family: 'Consolas', 'Menlo', monospace;
 }
 
 .online > .label > .led {
@@ -301,7 +301,7 @@ div.section-header {
     padding-left: 8px;
     padding-right: 8px;
     font-size: smaller;
-    /*font-family: 'Consolas', monospace;*/
+    /*font-family: 'Consolas', 'Menlo', monospace;*/
     border-right: 1px solid rgb(160,160,160);
     border-bottom: 1px solid rgb(160,160,160);
     cursor: cell;

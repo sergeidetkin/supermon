@@ -77,7 +77,7 @@ commands.monitor =
             }
         }
     },
-    send_alert: {
+    raise_alert: {
         name: "raise alert",
         description: "Raise alert",
         parameters: {

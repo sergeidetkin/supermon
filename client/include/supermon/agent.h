@@ -22,6 +22,7 @@
 #include <memory>
 #include <future>
 #include <chrono>
+#include <map>
 
 #include "boost/asio.hpp"
 #include "boost/asio/system_timer.hpp"
@@ -52,6 +53,7 @@ namespace supermon
         using connect    = std::function<void ()>;
         using disconnect = std::function<void (const std::runtime_error&)>;
         using message    = std::function<void (const std::string& tag, const ptree_ptr_t& head, const ptree_ptr_t& body)>;
+        using handler    = std::function<void (const ptree_ptr_t& head, const ptree_ptr_t& body)>;
     }
 
     class agent final
@@ -64,9 +66,11 @@ namespace supermon
         void connect();
         void shutdown();
 
+    public:
         boost::asio::io_service& io_service();
 
     public:
+        void on(const std::string& tag, const callback::handler&);
         void send(const std::string& channel, const std::string& message, long port = 0);
         void send(const std::string& channel, const dataset& data, long port = 0);
         void alert(const std::string& text);
@@ -95,6 +99,7 @@ namespace supermon
         boost::asio::ip::tcp::socket                            _socket;
         beast::websocket::stream<boost::asio::ip::tcp::socket&> _websocket;
         std::chrono::time_point<std::chrono::system_clock>      _when = std::chrono::system_clock::now();
+        std::map<std::string, callback::handler>                _handlers;
     };
 
 }

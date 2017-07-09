@@ -61,6 +61,8 @@ int main(int argc, char* argv[])
             arguments["port"].as<std::uint16_t>()
         });
 
+        // setup error and status notification handlers
+
         agent.onerror = [&io](const std::runtime_error& error)
         {
             io.post([&io, error]()
@@ -88,65 +90,99 @@ int main(int argc, char* argv[])
             });
         };
 
-        agent.onmessage = [&io, &agent](const std::string& tag, const supermon::ptree_ptr_t& head, const supermon::ptree_ptr_t& request)
+        // now set up the message handlers
+
+        agent.on("raise_alert", [&](const supermon::ptree_ptr_t& head, const supermon::ptree_ptr_t& msg)
         {
-            io.post([&io, &agent, tag, head, request]()
+            std::string text = msg->get<std::string>("text");
+            agent.alert(text);
+            agent.send("warning", "raised alert '" + text + "'");
+        });
+
+        agent.on("get_weather_private", [&](const supermon::ptree_ptr_t& head, const supermon::ptree_ptr_t& msg)
+        {
+            io.post([=, &agent]()
             {
-                if ("send_alert" == tag) {
-                    std::string text = request->get<std::string>("text");
-                    agent.alert(text);
-                    agent.send("warning", "raised alert '" + text + "'");
-                }
-                else if ("publish_weather_report" == tag)
+                agent.send("log", "executing " + head->get<std::string>("tag") + "...");
+
+                auto receive_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+                auto send_time = head->get<long>("when");
+
+                supermon::dataset data;
+
+                for (size_t n = 0; n < 10; ++n)
                 {
-                    agent.send("log", "executing " + tag + "...");
-                    std::chrono::microseconds now = std::chrono::system_clock::now().time_since_epoch();
-                    std::chrono::milliseconds timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(now);
-
-                    supermon::dataset data;
-
-                    for (size_t n = 0; n < 10; ++n) {
-                        data.insert(std::to_string(now.count()), "foo", nullptr, false, "New York", "NY", "blah", "bar");
-                        data.insert(true, std::to_string(timestamp.count()), "blah", tag, "London", "UK", "foo", false);
-                        // or
-                        supermon::dataset::row& r = data.insertRow();
-                        r += "12:30", 2, true, 4, nullptr, false, 7, 8.0;
-                    }
-
-                    agent.send("weather", data);
-                    //agent.send("log", "executed " + tag + ".");
+                    supermon::dataset::row& r = data.insertRow();
+                    r += receive_time - send_time, head->get<long>("port"), 3, 4, nullptr, false, 7, 8.0;
                 }
-                else if ("get_weather_private" == tag)
-                {
-                    agent.send("log", "executing " + tag + "...");
-                    supermon::dataset data;
 
-                    for (size_t n = 0; n < 10; ++n) {
-                        supermon::dataset::row& r = data.insertRow();
-                        r += "12:30", head->get<long>("port"), 3, 4, nullptr, false, 7, 8.0;
-                    }
-
-                    agent.send("weather", data, head->get<long>("port"));
-                }
-                else if ("shutdown" == tag) {
-                    std::ostringstream os;
-                    boost::property_tree::write_json(os, *request, false);
-                    os << ": shutting down...";
-                    agent.send("warning", os.str());
-                    io.stop();
-                }
-                else if ("ping" == tag) {
-                    agent.info(tag);
-                    agent.send("log", request->get<std::string>("user"));
-                }
-                else {
-                    agent.info(tag);
-                    agent.send("error", "don't know what to do with '" + tag + "'");
-                }
+                agent.send("weather", data, head->get<long>("port"));
             });
+        });
+
+        agent.on("publish_weather_report", [&](const supermon::ptree_ptr_t& head, const supermon::ptree_ptr_t& msg)
+        {
+            io.post([=, &agent]()
+            {
+                auto tag = head->get<std::string>("tag");
+                agent.send("log", "executing " + tag + "...");
+
+
+                // how to deal with chrono serialization
+                std::chrono::microseconds now = std::chrono::system_clock::now().time_since_epoch();
+                auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
+
+                std::time_t t = timestamp / 1000;
+                auto ms = timestamp % 1000;
+
+                std::ostringstream os;
+                os << std::put_time(std::localtime(&t), "%T.") << std::setfill('0') << std::setw(3) << ms;
+                auto strtime = os.str();
+
+                supermon::dataset data;
+
+                for (size_t n = 0; n < 10; ++n)
+                {
+                    data.insert(strtime, "foo", nullptr, false, "New York", "NY", "blah", "bar");
+                    data.insert(true, strtime, "blah", tag, "London", "UK", "foo", false);
+                    // or
+                    supermon::dataset::row& r = data.insertRow();
+                    r += strtime, 2, true, 4, nullptr, false, 7, 8.0;
+                }
+
+                agent.send("weather", data);
+            });
+        });
+
+        agent.on("shutdown", [&](const supermon::ptree_ptr_t& head, const supermon::ptree_ptr_t& msg)
+        {
+            std::ostringstream os;
+            os << "shutting down..." << " user='" << msg->get<std::string>("user")  << "', time1=" << msg->get<std::string>("time1");
+            agent.send("warning", os.str());
+            io.stop();
+        });
+
+        // unhandled message handler
+
+        agent.onmessage = [&](const std::string& tag, const supermon::ptree_ptr_t& head, const supermon::ptree_ptr_t& msg)
+        {
+            if ("ping" == tag)
+            {
+                agent.info(tag);
+                agent.send("log", msg->get<std::string>("user"));
+            }
+            else {
+                std::ostringstream os;
+                boost::property_tree::write_json(os, *msg, false);
+                agent.send("error", "don't know what to do with " + tag + ": " + os.str());
+            }
         };
 
+        // call agent.connect() *after* setting the message handlers to avoid race conditions
+
         agent.connect();
+
+        // chage the alert|info badge periodically
 
         boost::asio::system_timer timer(io);
 
@@ -156,8 +192,8 @@ int main(int argc, char* argv[])
         {
             if (error != boost::asio::error::operation_aborted)
             {
-                auto ticks = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-                agent.send("log", "the time now is: " + std::to_string(ticks));
+                //auto ticks = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+                //agent.send("log", "the time now is: " + std::to_string(ticks));
 
                 if (flag)
                 {
@@ -177,6 +213,9 @@ int main(int argc, char* argv[])
 
         timer.expires_from_now(std::chrono::milliseconds(5000));
         timer.async_wait(tick);
+
+
+        // run our own event pump
 
         io.run();
 

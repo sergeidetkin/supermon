@@ -137,13 +137,17 @@ namespace supermon
             auto head = std::shared_ptr<boost::property_tree::ptree>(message, &root.get_child("head"));
             auto body = std::shared_ptr<boost::property_tree::ptree>(message, &root.get_child("body"));
 
-//            auto when = head->get<long>("when");
-//            timespec t = { .tv_sec = when / 1000, .tv_nsec = (when % 1000) }; // using tv_nsec to store milliseconds
-//
-//            std::cout << std::put_time(std::localtime(&t.tv_sec), "%T.") << std::setfill('0') << std::setw(3) << t.tv_nsec << " : ";
-//            boost::property_tree::write_json(std::cout, *head, true);
+            head->put("tag", tag);
 
-            if (onmessage) onmessage(tag, head, body);
+            const auto& it = _handlers.find(tag);
+            if (_handlers.end() != it)
+            {
+                it->second(head, body);
+            }
+            else if (onmessage)
+            {
+                onmessage(tag, head, body);
+            }
         }
         catch (const std::exception& e)
         {
@@ -307,4 +311,10 @@ namespace supermon
             }
         );
     }
+
+    void agent::on(const std::string& tag, const callback::handler& f)
+    {
+        _handlers[tag] = f;
+    }
+
 }
