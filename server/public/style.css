@@ -10,6 +10,7 @@ body {
     margin: 0px;
     display: flex;
     overflow: hidden;
+    -webkit-font-smoothing: subpixel-antialiased;
 }
 
 .flex-container {
