@@ -86,6 +86,9 @@ commands.monitor =
             }
         }
     },
+    make_love: {
+        name: "make love"
+    },
     shutdown: {
         name: "shutdown process",
         description: "Send shutdown request",

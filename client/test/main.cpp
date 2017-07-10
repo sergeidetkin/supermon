@@ -174,7 +174,7 @@ int main(int argc, char* argv[])
             else {
                 std::ostringstream os;
                 boost::property_tree::write_json(os, *msg, false);
-                agent.send("error", "don't know what to do with " + tag + ": " + os.str());
+                agent.send("error", "don't know how to " + tag + ": " + os.str());
             }
         };
 

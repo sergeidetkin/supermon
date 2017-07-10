@@ -107,6 +107,7 @@ div.section-header {
 
 #input select {
     min-width: 100%;
+    font-size: inherit;
 }
 
 #form {
@@ -253,7 +254,7 @@ div.section-header {
 }
 
 #channel-view > .item {
-    font-size: 10pt;
+    font-size: small;
     font-family: 'Consolas', 'Menlo', monospace;
 }
 

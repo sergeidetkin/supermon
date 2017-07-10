@@ -137,12 +137,12 @@ namespace supermon
             auto head = std::shared_ptr<boost::property_tree::ptree>(message, &root.get_child("head"));
             auto body = std::shared_ptr<boost::property_tree::ptree>(message, &root.get_child("body"));
 
-            head->put("tag", tag);
-
             const auto& it = _handlers.find(tag);
-            if (_handlers.end() != it)
+            if (_handlers.end() != it && it->second)
             {
-                it->second(head, body);
+                head->put("tag", tag);
+                const auto& handler = it->second;
+                handler(head, body);
             }
             else if (onmessage)
             {
