@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
             return EXIT_FAILURE;
         }
 
-        std::cerr << std::this_thread::get_id() << ": started..." << std::endl;
+        std::cout << std::this_thread::get_id() << ": started..." << std::endl;
 
         boost::asio::io_service io;
         boost::asio::io_service::work work(io);
@@ -74,11 +74,7 @@ int main(int argc, char* argv[])
 
         agent.onconnect = [&io, &agent]()
         {
-            io.post([&agent]()
-            {
-                std::cout << std::this_thread::get_id() << ": connected :)" << std::endl;
-                agent.send("log", "hello!");
-            });
+            agent.send("log", "hello!");
         };
 
         agent.ondisconnect = [&io](const std::runtime_error& error)
