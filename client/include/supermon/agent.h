@@ -75,6 +75,8 @@ namespace supermon
         void send(const std::string& channel, const dataset& data, long port = 0);
         void alert(const std::string& text);
         void info(const std::string& text);
+        void get_schema(const std::function<void (const ptree_ptr_t& schema)>&);
+        //void put_schema(const ptree_ptr_t&);
 
     private:
         void init();

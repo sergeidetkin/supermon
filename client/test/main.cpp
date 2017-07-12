@@ -74,6 +74,7 @@ int main(int argc, char* argv[])
 
         agent.onconnect = [&io, &agent]()
         {
+            std::cout << std::this_thread::get_id() << ": connected! " << std::endl;
             agent.send("log", "hello!");
         };
 

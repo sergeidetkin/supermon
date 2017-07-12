@@ -179,16 +179,19 @@ namespace supermon
             {
                 if (error)
                 {
-                    switch (error.value())
-                    {
-                        case (int)beast::websocket::error::closed:
-                        case (int)boost::asio::error::eof:
-                            if (ondisconnect) ondisconnect(std::runtime_error(error.message()));
-                            retry();
-                            return;
+                    if (ondisconnect) ondisconnect(std::runtime_error(error.message()));
+                    return retry();
 
-                        default: throw std::runtime_error((std::to_string(error.value()) + ": " + error.message()).c_str());
-                    }
+//                    switch (error.value())
+//                    {
+//                        case (int)beast::websocket::error::closed:
+//                        case (int)boost::asio::error::eof:
+//                            if (ondisconnect) ondisconnect(std::runtime_error(error.message()));
+//                            retry();
+//                            return;
+//
+//                        default: throw std::runtime_error((std::to_string(error.value()) + ": " + error.message()).c_str());
+//                    }
                 }
                 else
                 {
@@ -270,6 +273,11 @@ namespace supermon
         msg.put("status.when", timestamp());
         msg.put("status.text", text);
         send(msg);
+    }
+
+    void agent::get_schema(const std::function<void (const ptree_ptr_t& schema)>& cb)
+    {
+
     }
 
     void agent::connect()

@@ -231,6 +231,16 @@ class ApiMessageHandler extends MessageHandler
         user.notify('login', message);
     }
 
+    onschema(message)
+    {
+        if (message.get) {
+            const response = {
+                schema: clients[this.clientId]
+            };
+            this.send(response);
+        }
+    }
+
     onpush(message) {
         const channel = channels[this.clientId][message.channel];
         if (channel) {
