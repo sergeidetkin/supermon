@@ -1,5 +1,8 @@
+// exempli gratia
 
 var enumerations = {};
+var commands = {};
+var channels = {};
 
 enumerations.time =
 [
@@ -18,8 +21,31 @@ enumerations.colors =
     { name: "Blue",   value: "rgb(0,0,255)"}
 ];
 
-var commands = {};
+// common commands
+commands.common =
+{
+    ping: {
+        name: "ping process",
+        description: "Ping the process",
+        parameters: {
+            user: {
+                name: "User"
+            }
+        }
+    },
+    shutdown: {
+        name: "shutdown",
+        description: "Kill the process",
+        parameters: {
+            when: {
+                name: "When",
+                values: enumerations.time
+            }
+        }
+    }
+};
 
+// commands for monitor_test
 commands.monitor_test =
 {
     pong: {
@@ -41,21 +67,16 @@ commands.monitor_test =
             }
         }
     },
-    shutdown: {
-        name: "shutdown",
-        description: "Kill the process",
-        parameters: {
-            when: {
-                name: "When",
-                values: enumerations.time
-            }
-        }
-    },
     command_1: { name: "command 1" },
     command_2: { name: "command 2" },
     command_3: { name: "command 3" }
 };
 
+// append common commands to monitor_test
+// common commands at the end
+Object.assign(commands.monitor_test, commands.common);
+
+// monitor commands
 commands.monitor =
 {
     publish_weather_report: {
@@ -68,15 +89,6 @@ commands.monitor =
         description: "Update and send the weather report to this instance only",
         channel: "weather"
     },
-    ping: {
-        name: "ping process",
-        description: "Ping the process",
-        parameters: {
-            user: {
-                name: "User"
-            }
-        }
-    },
     raise_alert: {
         name: "raise alert",
         description: "Raise alert",
@@ -88,27 +100,40 @@ commands.monitor =
     },
     make_love: {
         name: "make love"
-    },
-    shutdown: {
-        name: "shutdown process",
-        description: "Send shutdown request",
-        parameters: {
-            user: {
-                name: "User"
-            },
-            time1: {
-                name: "Time 1",
-                values: enumerations.time
-            },
-            time2: {
-                name: "Time 2",
-                values: enumerations.time
-            }
+    }
+};
+
+// append common commands to monitor
+Object.assign(commands.monitor, commands.common);
+
+
+// combine common commands with one_more command for foobar process
+// common commands first
+commands.foobar = Object.assign({}, commands.common, {
+    one_more: {
+        name: "foobar's own command"
+    }
+});
+
+// add another command to the foobar
+commands.foobar.plus_one =
+{
+    name: "one last thing",
+    parameters: {
+        thing: {
+            name: "The thing",
+            // optional values inlined
+            values: [
+                { name: "is false", value: false },
+                { name: "is true", value: true }
+            ]
         }
     }
 };
 
-var channels = {};
+// plain copy single command from another process
+commands.foobar.publish_weather_report = commands.monitor.publish_weather_report;
+
 
 channels.monitor =
 {
@@ -131,6 +156,9 @@ channels.monitor =
 };
 
 channels.monitor_test = channels.monitor;
+
+channels.foobar = channels.monitor;
+
 
 exports.commands = commands;
 exports.channels = channels;
