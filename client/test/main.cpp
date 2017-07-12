@@ -153,7 +153,7 @@ int main(int argc, char* argv[])
         agent.on("shutdown", [&](const supermon::ptree_ptr_t& head, const supermon::ptree_ptr_t& msg)
         {
             std::ostringstream os;
-            os << "shutting down..." << " user='" << msg->get<std::string>("user")  << "', time1=" << msg->get<std::string>("time1");
+            os << "shutting down...";
             agent.send("warning", os.str());
             io.stop();
         });
