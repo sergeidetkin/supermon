@@ -106,7 +106,7 @@ class Application
 
     createInputForm(command) {
         var form = document.createElement('div');
-        form.setAttribute('id', 'form');
+        form.id = 'form';
 
         var div = document.createElement('div');
         div.textContent = command.description || command.name;
@@ -292,7 +292,8 @@ class Application
             }
         }
 
-        it.name = client.name + '.' + client.instance + '.' + client.pid;
+        it.name = client.name + '.' + client.instance;
+        it.element.title = client.name + '.' + client.instance + '.' + client.pid;
 
         this.updateClientStatus(client);
     }
