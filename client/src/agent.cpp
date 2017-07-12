@@ -278,7 +278,7 @@ namespace supermon
         (
             _socket,
             boost::asio::ip::tcp::resolver(_io).resolve(boost::asio::ip::tcp::resolver::query(_config.host, std::to_string(_config.port))),
-            [this](const boost::system::error_code& error, auto /*iterator*/)
+            [this](const boost::system::error_code& error, boost::asio::ip::tcp::resolver::iterator /*it*/)
             {
                 if (!error)
                 {
@@ -290,11 +290,11 @@ namespace supermon
 
                     boost::property_tree::ptree login;
 
-                    login.put("login.name", name);
-                    login.put("login.instance", _config.instance);
-                    login.put("login.pid", boost::this_process::get_id());
-                    login.put("login.hostname", boost::asio::ip::host_name());
-                    login.put("login.when", timestamp());
+                    login.put("login.name",      name);
+                    login.put("login.instance",  _config.instance);
+                    login.put("login.pid",       boost::this_process::get_id());
+                    login.put("login.hostname",  boost::asio::ip::host_name());
+                    login.put("login.when",      timestamp());
                     login.put("login.timestamp", std::chrono::duration_cast<std::chrono::milliseconds>(_when.time_since_epoch()).count());
 
                     send(login);
