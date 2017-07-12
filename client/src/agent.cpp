@@ -223,7 +223,7 @@ namespace supermon
     template<typename T = std::chrono::milliseconds>
     long long timestamp()
     {
-        std::chrono::microseconds now = std::chrono::system_clock::now().time_since_epoch();
+        auto now = std::chrono::system_clock::now().time_since_epoch();
         return std::chrono::duration_cast<T>(now).count();
     }
 

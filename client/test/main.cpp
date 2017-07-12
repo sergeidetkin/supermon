@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
 
 
                 // how to deal with chrono serialization
-                std::chrono::microseconds now = std::chrono::system_clock::now().time_since_epoch();
+                auto now = std::chrono::system_clock::now().time_since_epoch();
                 auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
 
                 std::time_t t = timestamp / 1000;
