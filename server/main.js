@@ -95,8 +95,7 @@ class EventSource extends EventEmitter
         this.removeListener(type, handler);
 
         if (purge) {
-            console.log("purging data cache channel '" + this.name + "', event type '" + type + "'");
-            // delete private event history, if any
+            //console.log("purging data cache channel '" + this.name + "', event type '" + type + "'");
             if (-1 != type.indexOf('@')) {
                 if (undefined != this.cache[type]) {
                     this.cache[type].length = 0;
