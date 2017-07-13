@@ -34,7 +34,8 @@ class EventSource extends EventEmitter
         super();
         this.setMaxListeners(0);
         this.cache = {};
-        const options = args || { history: 0 };
+        const options = args || { history: 0, name: 'unnamed'};
+        this.name = options.name;
         this.cache_max = options.history || 0;
     }
 
@@ -68,7 +69,7 @@ class EventSource extends EventEmitter
 
         if (null != target) {
             handler = method.bind(target);
-            target['on' + type.split('_')[0]] = handler;
+            target['on' + type.split('@')[0]] = handler;
         }
         else {
             handler = method;
@@ -90,21 +91,24 @@ class EventSource extends EventEmitter
         this.on(type, handler);
     }
 
-    unsubscribe(type, handler) {
+    unsubscribe(type, handler, purge) {
         this.removeListener(type, handler);
 
-        // delete private event history, if any
-        if (-1 != type.indexOf('_')) {
-            if (undefined != this.cache[type]) {
-                this.cache[type].length = 0;
-                delete this.cache[type];
+        if (purge) {
+            console.log("purging data cache channel '" + this.name + "', event type '" + type + "'");
+            // delete private event history, if any
+            if (-1 != type.indexOf('@')) {
+                if (undefined != this.cache[type]) {
+                    this.cache[type].length = 0;
+                    delete this.cache[type];
+                }
             }
         }
     }
 }
 
-const user = new EventSource();
-const api = new EventSource();
+const user = new EventSource({ name: 'user' });
+const api = new EventSource({ name: 'api' });
 
 class MessageHandler
 {
@@ -217,6 +221,7 @@ class ApiMessageHandler extends MessageHandler
             for (let topic in login.channels) {
                 //console.log(login.channels[topic].history);
                 hub[topic] = new EventSource({
+                    name: topic,
                     history: login.channels[topic].hasOwnProperty('columns') ? 1 : login.channels[topic].history
                 });
             }
@@ -246,7 +251,7 @@ class ApiMessageHandler extends MessageHandler
         if (channel) {
             const client = clients[this.clientId];
 
-            let topic = 'update' + ((0 < message.port) ? ('_' + message.port) : '');
+            let topic = 'update' + ((0 < message.port) ? ('@' + message.port) : '');
 
             channel.notify(topic, {
                 channel: message.channel,
@@ -319,10 +324,10 @@ class UserMessageHandler extends MessageHandler
         return channels[this.topic.name + '.' + this.topic.instance][this.topic.channel];
     }
 
-    onunsubscribe() {
+    onunsubscribe(purge) {
         //console.log('unsubscribe');
         if (null != this.topic) {
-            this.connection.unsubscribe('update_' + this.id, this.onupdate);
+            this.connection.unsubscribe('update@' + this.id, this.onupdate, true == purge);
             this.connection.unsubscribe('update', this.onupdate);
             this.topic = null;
         }
@@ -335,13 +340,13 @@ class UserMessageHandler extends MessageHandler
                 this.onunsubscribe();
                 this.topic = message;
                 this.connection.subscribe('update', null, this.onupdate, true);
-                this.connection.subscribe('update_' + this.id, null, this.onupdate, true);
+                this.connection.subscribe('update@' + this.id, null, this.onupdate, true);
             }
         }
         else {
             this.topic = message;
             this.connection.subscribe('update', null, this.onupdate, true);
-            this.connection.subscribe('update_' + this.id, null, this.onupdate, true);
+            this.connection.subscribe('update@' + this.id, null, this.onupdate, true);
         }
     }
 
@@ -377,7 +382,7 @@ class UserMessageHandler extends MessageHandler
     }
 
     finalize() {
-        this.onunsubscribe();
+        this.onunsubscribe(true);
         user.unsubscribe('login', this.onlogin);
         user.unsubscribe('status', this.onstatus);
         super.finalize();
