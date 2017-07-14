@@ -157,7 +157,7 @@ div.section-header {
 }
 
 .list-view#channel-view > .item:nth-child(even) {
-    background-color: #EEE;
+    background-color: #F5F5F5;
 }
 
 .list-view > .item > .label {
@@ -303,7 +303,6 @@ div.section-header {
     padding-left: 8px;
     padding-right: 8px;
     font-size: smaller;
-    /*font-family: 'Consolas', 'Menlo', monospace;*/
     border-right: 1px solid rgb(160,160,160);
     border-bottom: 1px solid rgb(160,160,160);
     cursor: cell;
@@ -312,17 +311,22 @@ div.section-header {
     text-overflow: ellipsis;
 }
 
-.dataset thead tr td {
+.dataset > thead > tr > td {
     /*color: rgb(20, 20, 20);*/
     font-weight: bold;
     background-color: #EEE;
 }
 
-.dataset tbody tr td:hover {
-    background-color: #EEE;
+.dataset > tbody > tr > td:first-child {
+    text-align: right;
+    /*background-color: #EEE;*/
 }
 
-.dataset tbody tr td:first-child {
-    text-align: right;
-    background-color: #EEE;
+.dataset > tbody > tr:nth-child(even) {
+    background-color: #F5F5F5;
 }
+
+.dataset > tbody > tr:hover {
+    /*background-color: #EFE;*/
+}
+

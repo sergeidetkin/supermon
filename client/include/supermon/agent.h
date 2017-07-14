@@ -67,16 +67,19 @@ namespace supermon
         void shutdown();
 
     public:
-        boost::asio::io_service& io_service();
-
-    public:
         void on(const std::string& tag, const callback::handler&);
+
         void send(const std::string& channel, const std::string& message, long port = 0);
         void send(const std::string& channel, const dataset& data, long port = 0);
+        void send(const std::string& channel, const std::string& action, const dataset& data, long port = 0);
+
         void alert(const std::string& text);
         void info(const std::string& text);
-        void get_schema(const std::function<void (const ptree_ptr_t& schema)>&);
-        //void put_schema(const ptree_ptr_t&);
+
+        void schema(const std::string& action, const ptree_t& subtree);
+
+    public:
+        boost::asio::io_service& io_service();
 
     private:
         void init();

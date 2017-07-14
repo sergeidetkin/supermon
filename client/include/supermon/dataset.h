@@ -130,6 +130,9 @@ namespace supermon
             return os;
         }
 
+    public:
+        row header;
+
     private:
         std::vector<row> _rows;
     };

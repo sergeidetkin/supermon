@@ -237,12 +237,7 @@ class ApiMessageHandler extends MessageHandler
 
     onschema(message)
     {
-        if (message.get) {
-            const response = {
-                schema: clients[this.clientId]
-            };
-            this.send(response);
-        }
+        console.log('schema', JSON.stringify(message));
     }
 
     onpush(message) {

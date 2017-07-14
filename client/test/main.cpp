@@ -25,6 +25,35 @@
 
 #include "supermon/agent.h"
 
+void badge(boost::asio::io_service& io, supermon::agent& agent)
+{
+    boost::asio::system_timer timer(io);
+    bool flag = true;
+
+    std::function<void(const boost::system::error_code&)> tick = [&](const boost::system::error_code& error)
+    {
+        if (error != boost::asio::error::operation_aborted)
+        {
+            if (flag)
+            {
+                agent.alert("testing, attention please!");
+            }
+            else
+            {
+                agent.info("blah blah blah");
+            }
+
+            flag = !flag;
+
+            timer.expires_from_now(std::chrono::milliseconds(5000));
+            timer.async_wait(tick);
+        }
+    };
+
+    timer.expires_from_now(std::chrono::milliseconds(5000));
+    timer.async_wait(tick);
+}
+
 int main(int argc, char* argv[])
 {
     try
@@ -62,7 +91,6 @@ int main(int argc, char* argv[])
         });
 
         // setup error and status notification handlers
-
         agent.onerror = [&io](const std::runtime_error& error)
         {
             io.post([&io, error]()
@@ -88,6 +116,22 @@ int main(int argc, char* argv[])
         };
 
         // now set up the message handlers
+
+        agent.on("modify_schema", [&](const supermon::ptree_ptr_t& head, const supermon::ptree_ptr_t& msg)
+        {
+            std::ostringstream os;
+            boost::property_tree::write_json(os, *msg, false);
+            agent.send
+            (
+                "warning",
+                "not implemented yet: "
+                + head->get<std::string>("tag")
+                + ": " + os.str()
+            );
+//            supermon::ptree_t subtree;
+//            subtree.put("action", msg->get<std::string>("action"));
+//            subtree.put("path", msg->get<std::string>("path"));
+        });
 
         agent.on("raise_alert", [&](const supermon::ptree_ptr_t& head, const supermon::ptree_ptr_t& msg)
         {
@@ -153,14 +197,11 @@ int main(int argc, char* argv[])
 
         agent.on("shutdown", [&](const supermon::ptree_ptr_t& head, const supermon::ptree_ptr_t& msg)
         {
-            std::ostringstream os;
-            os << "shutting down...";
-            agent.send("warning", os.str());
+            agent.send("warning", "shutting down...");
             io.stop();
         });
 
         // unhandled message handler
-
         agent.onmessage = [&](const std::string& tag, const supermon::ptree_ptr_t& head, const supermon::ptree_ptr_t& msg)
         {
             if ("ping" == tag)
@@ -176,44 +217,13 @@ int main(int argc, char* argv[])
         };
 
         // call agent.connect() *after* setting the message handlers to avoid race conditions
-
         agent.connect();
 
         // chage the alert|info badge periodically
-
-        boost::asio::system_timer timer(io);
-
-        bool flag = true;
-
-        std::function<void(const boost::system::error_code&)> tick = [&](const boost::system::error_code& error)
-        {
-            if (error != boost::asio::error::operation_aborted)
-            {
-                //auto ticks = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-                //agent.send("log", "the time now is: " + std::to_string(ticks));
-
-                if (flag)
-                {
-                    agent.alert("testing, attention please!");
-                }
-                else
-                {
-                    agent.info("blah blah blah");
-                }
-
-                flag = !flag;
-
-                timer.expires_from_now(std::chrono::milliseconds(5000));
-                timer.async_wait(tick);
-            }
-        };
-
-        timer.expires_from_now(std::chrono::milliseconds(5000));
-        timer.async_wait(tick);
+        badge(io, agent);
 
 
         // run our own event pump
-
         io.run();
 
         std::cerr << std::this_thread::get_id() << ": done." << std::endl;

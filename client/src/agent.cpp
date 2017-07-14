@@ -180,18 +180,8 @@ namespace supermon
                 if (error)
                 {
                     if (ondisconnect) ondisconnect(std::runtime_error(error.message()));
-                    return retry();
-
-//                    switch (error.value())
-//                    {
-//                        case (int)beast::websocket::error::closed:
-//                        case (int)boost::asio::error::eof:
-//                            if (ondisconnect) ondisconnect(std::runtime_error(error.message()));
-//                            retry();
-//                            return;
-//
-//                        default: throw std::runtime_error((std::to_string(error.value()) + ": " + error.message()).c_str());
-//                    }
+                    retry();
+                    return;
                 }
                 else
                 {
@@ -227,7 +217,7 @@ namespace supermon
         return std::chrono::duration_cast<T>(now).count();
     }
 
-    void agent::send(const std::string& channel, const dataset& data, long port)
+    void agent::send(const std::string& channel, const std::string& action, const dataset& data, long port)
     {
         try
         {
@@ -236,6 +226,7 @@ namespace supermon
             os << "{\"push\":{"
                << "\"when\":\"" << timestamp() << "\","
                << "\"channel\":\"" << channel << "\","
+               << "\"action\":\"" << action << "\","
                << "\"port\":\"" << port << "\","
                << "\"event\":{\"data\":" << data
                << "}}}";
@@ -245,6 +236,11 @@ namespace supermon
         {
             if (onerror) onerror(std::runtime_error(e.what()));
         }
+    }
+
+    void agent::send(const std::string& channel, const dataset& data, long port)
+    {
+        send(channel, "append", data, port);
     }
 
     void agent::send(const std::string& channel, const std::string& text, long port)
@@ -275,9 +271,13 @@ namespace supermon
         send(msg);
     }
 
-    void agent::get_schema(const std::function<void (const ptree_ptr_t& schema)>& cb)
+    void agent::schema(const std::string& action, const ptree_t& subtree)
     {
-
+        boost::property_tree::ptree msg;
+        msg.put("schema.action", action);
+        msg.put("schema.when", timestamp());
+        msg.add_child("schema.subtree", subtree);
+        send(msg);
     }
 
     void agent::connect()

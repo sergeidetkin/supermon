@@ -24,6 +24,22 @@ enumerations.colors =
 // common commands
 commands.common =
 {
+    modify_schema: {
+        name: "modify schema",
+        parameters: {
+            action: {
+                name: "Action",
+                values: [
+                    { name: "Append",  value: "append" },
+                    { name: "Replace", value: "replace" },
+                    { name: "Delete",  value: "delete" }
+                ]
+            },
+            path: {
+                name: "Path"
+            }
+        }
+    },
     ping: {
         name: "ping process",
         description: "Ping the process",
@@ -99,7 +115,13 @@ commands.monitor =
         }
     },
     make_love: {
-        name: "make love"
+        name: "make love",
+        parameters: {
+            color: {
+                name: "Color",
+                values: enumerations.colors
+            }
+        }
     }
 };
 
