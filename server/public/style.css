@@ -239,6 +239,31 @@ div.section-header {
     border-right: 1px solid rgb(160,160,160);
 }
 
+#panicbar {
+    color: white;
+    background-color: crimson;
+    border: none;
+}
+
+#panicbar > .item {
+    flex: 1 1 auto;
+    color: inherit;
+    border: none;
+}
+
+#panicbar > .item:hover {
+    background-color: inherit;
+}
+
+#panicbar > .item:last-child {
+    flex: 0 0 auto;
+    max-width: 1em;
+}
+
+#panicbar > .item:last-child:hover {
+    background-color: red;
+}
+
 #channel-bar > .item {
     /*border-top: 1px solid rgb(160,160,160);*/
 }

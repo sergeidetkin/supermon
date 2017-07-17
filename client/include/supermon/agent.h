@@ -73,8 +73,9 @@ namespace supermon
         void send(const std::string& channel, const dataset& data, long port = 0);
         void send(const std::string& channel, const std::string& action, const dataset& data, long port = 0);
 
-        void alert(const std::string& text);
         void info(const std::string& text);
+        void alert(const std::string& text);
+        void panic(const std::string& text);
 
         void schema(const std::string& action, const ptree_t& subtree);
 

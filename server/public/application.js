@@ -183,6 +183,11 @@ class Application
     }
 
     submitCommand(commandId, target) {
+        var command = target.commands[commandId];
+        var verb = command.description || command.name;
+        if (command.confirm) {
+            if (!window.confirm('Are you sure you want to ' + verb + '?')) return;
+        }
         var message = {
             command: {
                 id: commandId,

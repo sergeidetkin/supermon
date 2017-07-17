@@ -278,13 +278,22 @@ namespace supermon
         send(msg);
     }
 
+    void agent::panic(const std::string& text)
+    {
+        boost::property_tree::ptree msg;
+        msg.put("status.type", "panic");
+        msg.put("status.when", timestamp());
+        msg.put("status.text", text);
+        //send(msg);
+    }
+
     void agent::schema(const std::string& action, const ptree_t& subtree)
     {
         boost::property_tree::ptree msg;
         msg.put("schema.action", action);
         msg.put("schema.when", timestamp());
         msg.add_child("schema.subtree", subtree);
-        send(msg);
+        //send(msg);
     }
 
     void agent::connect()

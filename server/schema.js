@@ -52,6 +52,7 @@ commands.common =
     shutdown: {
         name: "shutdown",
         description: "Kill the process",
+        confirm: true,
         parameters: {
             when: {
                 name: "When",
