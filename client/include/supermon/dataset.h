@@ -92,6 +92,20 @@ namespace supermon
                 r.add(std::forward<T>(v));
                 return r;
             }
+
+            friend std::ostream& operator<<(std::ostream& os, const row& r)
+            {
+                os << "[";
+                bool first = true;
+                for (const auto& cell : r)
+                {
+                    if (!first) os << ",";
+                    else first = false;
+                    cell(os);
+                }
+                os << "]";
+                return os;
+            }
         };
 
     public:
@@ -111,20 +125,12 @@ namespace supermon
         friend std::ostream& operator<<(std::ostream& os, const dataset& data)
         {
             os << "[";
-            bool first_row = true;
+            bool first = true;
             for (const auto& row : data._rows)
             {
-                if (!first_row) os << ",";
-                else first_row = false;
-                os << "[";
-                bool first_cell = true;
-                for (const auto& cell : row)
-                {
-                    if (!first_cell) os << ",";
-                    else first_cell = false;
-                    cell(os);
-                }
-                os << "]";
+                if (!first) os << ",";
+                else first = false;
+                os << row;
             }
             os << "]";
             return os;

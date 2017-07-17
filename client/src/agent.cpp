@@ -228,8 +228,15 @@ namespace supermon
                << "\"channel\":\"" << channel << "\","
                << "\"action\":\"" << action << "\","
                << "\"port\":\"" << port << "\","
-               << "\"event\":{\"data\":" << data
-               << "}}}";
+               << "\"event\":{";
+
+            if (0 < data.header.size())
+            {
+                os << "\"header\":" << data.header << ",";
+            }
+
+            os << "\"data\":" << data << "}}}";
+
             _websocket.write(buffer.data());
         }
         catch (const std::exception& e)

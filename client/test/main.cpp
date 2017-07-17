@@ -150,11 +150,12 @@ int main(int argc, char* argv[])
                 auto send_time = head->get<long>("when");
 
                 supermon::dataset data;
+                data.header += "Latency (ms)", "Port", "Text";
 
                 for (size_t n = 0; n < 10; ++n)
                 {
                     supermon::dataset::row& r = data.insertRow();
-                    r += receive_time - send_time, head->get<long>("port"), 3, 4, nullptr, false, 7, 8.0;
+                    r += receive_time - send_time, head->get<long>("port"), "This is a test";
                 }
 
                 agent.send("weather", data, head->get<long>("port"));

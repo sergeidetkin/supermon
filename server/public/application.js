@@ -418,7 +418,7 @@ class Application
             else if (message.event.hasOwnProperty('data')) {
                 this.channelView.maxCount = 1;
                 it = new TableView();
-                it.columns = this.clients[identify(message.source)].channels[message.channel].columns;
+                it.columns = message.event.header || this.clients[identify(message.source)].channels[message.channel].columns;
                 it.data = message.event.data;
             }
             this.channelView.add(it);
