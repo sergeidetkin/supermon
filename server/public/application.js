@@ -52,11 +52,29 @@ class Application
         this.channelView = new ListView(document.querySelector('#channel-view'));
         this.channelView.maxCount = 100;
 
+        var hidePanicToolbar = document.querySelector('#panicbar > .item:last-child');
+        hidePanicToolbar.addEventListener('mouseup', this.onHidePanicToolbar.bind(this));
+
         this.reconnectTimeout = 3000; // ms
         this.reconnectAttemptsMax = Math.floor(60*1000 / this.reconnectTimeout);
         this.reconnectAttemptCount = 0;
 
         this.connect();
+    }
+
+    onHidePanicToolbar(e) {
+        var panicbar = document.querySelector('#panicbar');
+
+        var message = {
+            unpanic: {
+                id: panicbar.eventId
+            }
+        };
+
+        this.websocket.send(JSON.stringify(message));
+
+        panicbar.style.display = 'none';
+        window.dispatchEvent(new Event('split'));
     }
 
     onSelectedChannelChanged(e) {
@@ -437,9 +455,18 @@ class Application
             console.error('onstatus() failed: client not found', message.source);
             return;
         }
-        client.status = message.status;
+        client.status = { type: message.type, text: message.text, when: message.when };
         this.updateClientStatus(client);
         this.updateStatusBar();
+    }
+
+    onpanic(message) {
+        var panicbar = document.querySelector('#panicbar');
+        var banner = panicbar.firstElementChild;
+        banner.textContent = (new Date(message.when)).strtime() + ': ' + message.source.name + '.' + message.source.instance + ': ' + message.text;
+        panicbar.style.display = '';
+        panicbar.eventId = message.id;
+        window.dispatchEvent(new Event('split'));
     }
 }
 

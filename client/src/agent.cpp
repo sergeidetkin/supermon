@@ -284,7 +284,7 @@ namespace supermon
         msg.put("status.type", "panic");
         msg.put("status.when", timestamp());
         msg.put("status.text", text);
-        //send(msg);
+        send(msg);
     }
 
     void agent::schema(const std::string& action, const ptree_t& subtree)

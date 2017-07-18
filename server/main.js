@@ -26,7 +26,11 @@ const schema = require('./schema');
 const config = require('./config');
 
 const clients = {};
-const channels ={};
+const channels = {};
+const panic = {
+    last: 0,
+    messages: []
+};
 
 class EventSource extends EventEmitter
 {
@@ -194,6 +198,9 @@ class ApiMessageHandler extends MessageHandler
         };
 
         const event = {
+            type: client.status.type,
+            text: client.status.text,
+            when: client.status.when,
             source: {
                 name: client.name,
                 instance: client.instance
@@ -265,15 +272,38 @@ class ApiMessageHandler extends MessageHandler
 
     onstatus(message) {
         const client = clients[this.clientId];
-        client.status = message;
 
-        user.notify('status', {
-            status: message.status,
-            source: {
-                name: client.name, 
-                instance: client.instance 
-            }
-        });
+        if ('panic' == message.type) {
+            ++panic.last;
+
+            const event = {
+                id: panic.last,
+                text: message.text,
+                source: {
+                    name: client.name,
+                    instance: client.instance
+                },
+                when: message.when
+            };
+
+            panic.messages.push(event);
+            user.notify('panic', event);
+
+            return;
+        }
+        else {
+            client.status = message;
+
+            user.notify('status', {
+                type: message.type,
+                text: message.text,
+                source: {
+                    name: client.name,
+                    instance: client.instance
+                },
+                when: message.when
+            });
+        }
     }
 
     oncommand(event) {
@@ -309,6 +339,12 @@ class UserMessageHandler extends MessageHandler
 
         user.subscribe('login', this, this.onlogin);
         user.subscribe('status', this, this.onstatus);
+
+        if (0 < panic.messages.length) {
+            this.onpanic(panic.messages[panic.messages.length - 1]);
+        }
+
+        user.subscribe('panic', this, this.onpanic);
 
         const message = { 'snapshot' : clients };
         this.send(message);
@@ -349,6 +385,16 @@ class UserMessageHandler extends MessageHandler
         api.notify('command', message);
     }
 
+    onunpanic(message) {
+        if (0 < panic.messages.length && message.id == panic.messages[panic.messages.length - 1].id) {
+            panic.messages.pop();
+
+            if (0 < panic.messages.length) {
+                this.onpanic(panic.messages[panic.messages.length - 1]);
+            }
+        }
+    }
+
     onupdate(event) {
         const message = { update: event };
         this.send(message);
@@ -360,18 +406,12 @@ class UserMessageHandler extends MessageHandler
     }
 
     onstatus(event) {
-        const client = clients[event.source.name + '.' + event.source.instance];
-        if (undefined == client) {
-            console.log('failed to locate the source for:', JSON.stringify(event));
-            return;
-        }
+        const message = { status: event };
+        this.send(message);
+    }
 
-        const message = {
-            status: {
-                status: client.status,
-                source: event.source
-            }
-        };
+    onpanic(event) {
+        const message = { panic: event };
         this.send(message);
     }
 
@@ -379,6 +419,7 @@ class UserMessageHandler extends MessageHandler
         this.onunsubscribe(true);
         user.unsubscribe('login', this.onlogin);
         user.unsubscribe('status', this.onstatus);
+        user.unsubscribe('panic', this.onstatus);
         super.finalize();
     }
 
