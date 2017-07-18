@@ -72,9 +72,6 @@ class Application
         };
 
         this.websocket.send(JSON.stringify(message));
-
-        panicbar.style.display = 'none';
-        window.dispatchEvent(new Event('split'));
     }
 
     onSelectedChannelChanged(e) {
@@ -463,10 +460,16 @@ class Application
     onpanic(message) {
         var panicbar = document.querySelector('#panicbar');
         var banner = panicbar.firstElementChild;
-        banner.textContent = (new Date(message.when)).strtime() + ': ' + message.source.name + '.' + message.source.instance + ': ' + message.text;
-        panicbar.style.display = '';
-        panicbar.eventId = message.id;
-        window.dispatchEvent(new Event('split'));
+        if (message.id) {
+            banner.textContent = (new Date(message.when)).strtime() + ': ' + message.source.name + '.' + message.source.instance + ': ' + message.text;
+            panicbar.style.display = '';
+            panicbar.eventId = message.id;
+            window.dispatchEvent(new Event('split'));
+        }
+        else {
+            panicbar.style.display = 'none';
+            window.dispatchEvent(new Event('split'));
+        }
     }
 }
 

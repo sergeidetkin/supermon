@@ -390,7 +390,10 @@ class UserMessageHandler extends MessageHandler
             panic.messages.pop();
 
             if (0 < panic.messages.length) {
-                this.onpanic(panic.messages[panic.messages.length - 1]);
+                user.notify('panic', panic.messages[panic.messages.length - 1]);
+            }
+            else {
+                user.notify('panic', {});
             }
         }
     }
