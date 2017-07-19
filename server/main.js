@@ -389,13 +389,12 @@ class UserMessageHandler extends MessageHandler
     onunpanic(message) {
         if (0 < panic.messages.length && message.id == panic.messages[panic.messages.length - 1].id) {
             panic.messages.pop();
-
-            if (0 < panic.messages.length) {
-                user.notify('panic', panic.messages[panic.messages.length - 1]);
-            }
-            else {
-                user.notify('panic', {});
-            }
+        }
+        if (0 < panic.messages.length) {
+            user.notify('panic', panic.messages[panic.messages.length - 1]);
+        }
+        else {
+            user.notify('panic', {});
         }
     }
 
