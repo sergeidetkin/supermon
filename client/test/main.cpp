@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
 //            supermon::ptree_t subtree;
 //            subtree.put("action", msg->get<std::string>("action"));
 //            subtree.put("path", msg->get<std::string>("path"));
-            agent.panic("Aaaaa!");
+            agent.panic("Really long and annoying message!");
         });
 
         agent.on("raise_alert", [&](const supermon::ptree_ptr_t& head, const supermon::ptree_ptr_t& msg)

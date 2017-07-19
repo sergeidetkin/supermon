@@ -246,7 +246,6 @@ div.section-header {
 }
 
 #panicbar > .item {
-    flex: 1 1 auto;
     color: inherit;
     border: none;
 }
@@ -255,8 +254,21 @@ div.section-header {
     background-color: inherit;
 }
 
+#panicbar > .item:first-child {
+}
+
+#panicbar > .item:nth-child(3) {
+    padding: 0px;
+}
+
+#panicbar > .item:nth-child(4) {
+    flex: 1 1 auto;
+    border: none;
+}
+
 #panicbar > .item:last-child {
     flex: 0 0 auto;
+    border: none;
     max-width: 1em;
 }
 

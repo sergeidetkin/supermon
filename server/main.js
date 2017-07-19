@@ -279,6 +279,7 @@ class ApiMessageHandler extends MessageHandler
             const event = {
                 id: panic.last,
                 text: message.text,
+                count: panic.messages.length + 1,
                 source: {
                     name: client.name,
                     instance: client.instance

@@ -459,11 +459,20 @@ class Application
 
     onpanic(message) {
         var panicbar = document.querySelector('#panicbar');
-        var banner = panicbar.firstElementChild;
+        var count = panicbar.firstElementChild;
+        var timestamp = count.nextElementSibling;
+        var source = timestamp.nextElementSibling;
+        var text = source.nextElementSibling;
+
         if (message.id) {
-            banner.textContent = (new Date(message.when)).strtime() + ': ' + message.source.name + '.' + message.source.instance + ': ' + message.text;
+            count.textContent = message.count;
+            timestamp.textContent = (new Date(message.when)).strtime();
+            source.textContent = message.source.name + '.' + message.source.instance;
+            text.textContent = message.text;
+
             panicbar.style.display = '';
             panicbar.eventId = message.id;
+
             window.dispatchEvent(new Event('split'));
         }
         else {
