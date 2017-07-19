@@ -52,8 +52,8 @@ class Application
         this.channelView = new ListView(document.querySelector('#channel-view'));
         this.channelView.maxCount = 100;
 
-        var hidePanicToolbar = document.querySelector('#panicbar > .item:last-child');
-        hidePanicToolbar.addEventListener('mouseup', this.onHidePanicToolbar.bind(this));
+        var clearPanicButton = document.querySelector('#panicbar > .item:last-child');
+        clearPanicButton.addEventListener('mouseup', this.onClearGlobalAlert.bind(this));
 
         this.reconnectTimeout = 3000; // ms
         this.reconnectAttemptsMax = Math.floor(60*1000 / this.reconnectTimeout);
@@ -62,7 +62,7 @@ class Application
         this.connect();
     }
 
-    onHidePanicToolbar(e) {
+    onClearGlobalAlert(e) {
         var panicbar = document.querySelector('#panicbar');
 
         var message = {
@@ -328,6 +328,12 @@ class Application
         document.querySelector('#statusbar > .item > #connected').textContent = this.connectedClientsCount;
     }
 
+    displayPanicBar(show) {
+        var panicbar = document.querySelector('#panicbar');
+        panicbar.style.display = (true == show) ? '' : 'none';
+        window.dispatchEvent(new Event('split'));
+    }
+
     get connectedClientsCount() {
         var total = 0;
         var connected = 0;
@@ -398,6 +404,7 @@ class Application
         this.clients = {};
         this.processListView.clear();
         this.updateStatusBar();
+        this.displayPanicBar(false);
     }
 
     onsnapshot(message) {
@@ -463,22 +470,17 @@ class Application
         var timestamp = count.nextElementSibling;
         var source = timestamp.nextElementSibling;
         var text = source.nextElementSibling;
+        var show = false;
 
         if (message.id) {
             count.textContent = message.count;
             timestamp.textContent = (new Date(message.when)).strtime();
             source.textContent = message.source.name + '.' + message.source.instance;
             text.textContent = message.text;
-
-            panicbar.style.display = '';
             panicbar.eventId = message.id;
-
-            window.dispatchEvent(new Event('split'));
+            show = true;
         }
-        else {
-            panicbar.style.display = 'none';
-            window.dispatchEvent(new Event('split'));
-        }
+        this.displayPanicBar(show);
     }
 }
 

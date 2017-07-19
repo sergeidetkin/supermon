@@ -13,6 +13,13 @@ body {
     -webkit-font-smoothing: subpixel-antialiased;
 }
 
+.disable-user-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 .flex-container {
     display: flex;
     flex: 1;
