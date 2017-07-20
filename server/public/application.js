@@ -52,8 +52,8 @@ class Application
         this.channelView = new ListView(document.querySelector('#channel-view'));
         this.channelView.maxCount = 100;
 
-        var clearPanicButton = document.querySelector('#panicbar > .item:last-child');
-        clearPanicButton.addEventListener('mouseup', this.onClearGlobalAlert.bind(this));
+        var clearGlobalAlert = document.querySelector('#panicbar > .item:last-child');
+        clearGlobalAlert.addEventListener('mouseup', this.onClearGlobalAlert.bind(this));
 
         this.reconnectTimeout = 3000; // ms
         this.reconnectAttemptsMax = Math.floor(60*1000 / this.reconnectTimeout);
