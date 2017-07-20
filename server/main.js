@@ -22,8 +22,8 @@ const HTTP = require('http');
 const WebSocket = require('ws');
 const EventEmitter = require('events');
 
-const schema = require('./schema');
 const config = require('./config');
+const schema = require('./schema');
 
 const clients = {};
 const channels = {};
