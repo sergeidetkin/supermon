@@ -16,7 +16,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const util = require('util');
+const getopt = require('node-getopt');
 
 const HTTP = require('http');
 const WebSocket = require('ws');
@@ -27,10 +27,47 @@ const schema = require('./schema');
 
 const clients = {};
 const channels = {};
+
 const panic = {
     last: 0,
     messages: []
 };
+
+function strtime(t) {
+    return ('00' + t.getHours()).slice(-2) + ':'
+    + ('00' + t.getMinutes()).slice(-2) + ':'
+    + ('00' + t.getSeconds()).slice(-2) + '.'
+    + ('000' + t.getMilliseconds()).slice(-3);
+};
+
+const cmdline = getopt.create([
+    ['l', 'log=ARG',     'set logging verbosity level ARG=[trace|debug|info|warning|error]'],
+    ['',  'dump-schema', 'dump the schema to stdout and exit'],
+    ['h', 'help',        'print this message']
+]).bindHelp().parseSystem();
+
+class log
+{
+    static put() {
+        const args = Array.from(arguments);
+        const format = '%s ' + args.shift();
+        console.log(format, strtime(new Date()), ...args);
+    }
+    static error() {}
+    static warning() {}
+    static info() {}
+    static debug() {}
+    static trace() {}
+}
+
+switch (cmdline.options.log) {
+    case 'error':   log.error = log.put; break;
+    case 'warning': log.warning = log.error = log.put; break;
+    case 'info':    log.info = log.warning = log.error = log.put; break;
+    case 'debug':   log.debug = log.info = log.warning = log.error = log.put; break;
+    case 'trace':   log.trace = log.debug = log.info = log.warning = log.error = log.put; break;
+    default:        cmdline.options.log = 'error'; log.error = log.put; break;
+}
 
 class EventSource extends EventEmitter
 {
@@ -99,7 +136,7 @@ class EventSource extends EventEmitter
         this.removeListener(type, handler);
 
         if (purge) {
-            //console.log("purging data cache channel '" + this.name + "', event type '" + type + "'");
+            log.trace("purging data cache channel '" + this.name + "', event type '" + type + "'");
             if (-1 != type.indexOf('@')) {
                 if (undefined != this.cache[type]) {
                     this.cache[type].length = 0;
@@ -128,9 +165,13 @@ class MessageHandler
 
         this.send = (message) => {
             if (!this.connected) return;
-            socket.send(JSON.stringify(message), (error) => {
+            const buffer = JSON.stringify(message);
+            socket.send(buffer, (error) => {
                 if (error) {
-                    console.error('websocket: failed to send <', message, '>', ' error: ', error);
+                    log.trace("[%s.%d] failed to send '%s'", this.constructor.name, this.id, buffer, error);
+                }
+                else {
+                    log.trace('[%s.%d] ==> %s', this.constructor.name, this.id, buffer);
                 }
             });
         }
@@ -144,6 +185,7 @@ class MessageHandler
 
     onmessage(socket, buffer) {
         try {
+            log.trace('[%s.%d] <==', this.constructor.name, this.id, buffer);
             const message = JSON.parse(buffer);
             const id = Object.keys(message)[0];
             if ('function' == typeof(this['on'+id])) {
@@ -157,23 +199,23 @@ class MessageHandler
                 this['on'+id](message[id]);
             }
             else {
-                console.log("unhandled: '%s'", buffer);
+                log.warning("[%s.%d] unhandled message: '%s'", this.constructor.name, this.id, JSON.stringify(message));
             }
         }
         catch (e) {
-            console.error('failed to process incoming message', buffer, ': ', e);
+            log.error("[%s.%d] failed to process incoming message: '%s'", this.constructor.name, this.id, buffer, e);
         }
     }
 
     onclose(socket, code, reason) {
         this.connected = false;
-        //console.log('websocket: close: (%d) %s', code, reason);
+        log.debug('websocket: close: (%d) %s', code, reason);
         this.finalize();
     }
 
     onerror(error) {
         this.connected = false;
-        console.error('websocket: error: ', error);
+        log.error('websocket: error: ', error);
         this.finalize();
     }
 
@@ -225,7 +267,6 @@ class ApiMessageHandler extends MessageHandler
             channels[this.clientId] = {};
             const hub = channels[this.clientId];
             for (let topic in login.channels) {
-                //console.log(login.channels[topic].history);
                 hub[topic] = new EventSource({
                     name: topic,
                     history: login.channels[topic].hasOwnProperty('columns') ? 1 : login.channels[topic].history
@@ -244,7 +285,7 @@ class ApiMessageHandler extends MessageHandler
 
     onschema(message)
     {
-        console.log('schema', JSON.stringify(message));
+        log.debug('schema', JSON.stringify(message));
     }
 
     onpush(message) {
@@ -266,7 +307,7 @@ class ApiMessageHandler extends MessageHandler
             });
         }
         else {
-            console.log('Failed to dispatch push notification from', this.clientId, ':', JSON.stringify(message));
+            log.warning('failed to dispatch push notification from', this.clientId, ':', JSON.stringify(message));
         }
     }
 
@@ -279,7 +320,7 @@ class ApiMessageHandler extends MessageHandler
             const event = {
                 id: panic.last,
                 text: message.text,
-                count: panic.messages.length + 1,
+                depth: panic.messages.length + 1,
                 source: {
                     name: client.name,
                     instance: client.instance
@@ -356,7 +397,6 @@ class UserMessageHandler extends MessageHandler
     }
 
     onunsubscribe(purge) {
-        //console.log('unsubscribe');
         if (null != this.topic) {
             this.connection.unsubscribe('update@' + this.id, this.onupdate, true == purge);
             this.connection.unsubscribe('update', this.onupdate);
@@ -365,7 +405,6 @@ class UserMessageHandler extends MessageHandler
     }
 
     onsubscribe(message) {
-        //console.log(JSON.stringify(message));
         if (null != this.topic) {
             if (this.topic.channel != message.channel || this.topic.instance != message.instance || this.topic.name != message.name) {
                 this.onunsubscribe();
@@ -432,6 +471,11 @@ var application = new class Application
 {
     constructor() {
 
+        if (cmdline.options['dump-schema']) {
+            log.put(JSON.stringify(schema, null, '  '));
+            return process.exit(1);
+        }
+
         this.httpServer = HTTP.createServer((request, response) => {
             this.onHttpRequest(request, response);
         });
@@ -443,13 +487,13 @@ var application = new class Application
         });
 
         this.httpServer.listen(config.http.port, () => {
-            console.log('HTTP server listening on port %d', this.httpServer.address().port);
+            log.info('HTTP server listening on port %d', this.httpServer.address().port);
         });
 
     }
 
     onWebSocketConnect(socket, request) {
-        //console.log("websocket: accepted new connection. url: '%s'", request.url);
+        log.debug("websocket: accepted new connection. url: '%s'", request.url);
         switch (request.url) {
             case '/api': new ApiMessageHandler(socket); break;
             case '/user': new UserMessageHandler(socket); break;
@@ -479,7 +523,7 @@ var application = new class Application
         let url = request.url == '/' ? '/index.html' : request.url;
 
         if (-1 != url.search(/\.\./)) {
-            console.error('forbidden "%s"', url);
+            log.error('forbidden "%s"', url);
             return this.forbidden(response);
         }
 
@@ -488,7 +532,7 @@ var application = new class Application
         if (fs.existsSync(fname)) {
             const stat = fs.statSync(fname);
             if (stat.isDirectory()) {
-                console.error('forbidden "%s"', url);
+                log.error('forbidden "%s"', url);
                 return this.forbidden(response);
             }
             if (stat.isFile()) {
@@ -496,7 +540,7 @@ var application = new class Application
             }
         }
 
-        console.error('not found "%s"', url);
+        log.error('not found "%s"', url);
         return this.notFound(response);
     }
 

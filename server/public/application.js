@@ -319,7 +319,7 @@ class Application
     }
 
     updateStatusBar() {
-        var bg = this.online ? '#0C0' : 'crimson';
+        var bg = this.online ? '#0C0' : '#c02126'; // 'crimson'
         var fg = 'white';
         var status = document.querySelector('#statusbar > .item > #status');
         status.textContent = this.online ? document.location.host : 'connecting...';
@@ -466,14 +466,14 @@ class Application
 
     onpanic(message) {
         var panicbar = document.querySelector('#panicbar');
-        var count = panicbar.firstElementChild;
-        var timestamp = count.nextElementSibling;
+        var depth = panicbar.firstElementChild;
+        var timestamp = depth.nextElementSibling;
         var source = timestamp.nextElementSibling;
         var text = source.nextElementSibling;
         var show = false;
 
         if (message.id) {
-            count.textContent = message.count;
+            depth.textContent = message.depth;
             timestamp.textContent = (new Date(message.when)).strtime();
             source.textContent = message.source.name + '.' + message.source.instance;
             text.textContent = message.text;

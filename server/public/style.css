@@ -212,7 +212,8 @@ div.section-header {
     text-align: center;
 
     color: white;
-    background-color: crimson;
+    /*background-color: crimson;*/
+    background-color: #c02126;
 
     font-size: 8pt;
     text-transform: uppercase;
@@ -248,7 +249,8 @@ div.section-header {
 
 #panicbar {
     color: white;
-    background-color: crimson;
+    /*background-color: crimson;*/
+    background-color: #c02126;
     border: none;
 }
 
