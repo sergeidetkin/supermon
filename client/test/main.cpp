@@ -27,26 +27,37 @@
 
 void badge(boost::asio::io_service& io, supermon::agent& agent)
 {
-    boost::asio::system_timer timer(io);
-    bool flag = true;
+    static boost::asio::system_timer timer(io);
+    static bool flag = true;
 
-    std::function<void(const boost::system::error_code&)> tick = [&](const boost::system::error_code& error)
+    static std::function<void(const boost::system::error_code&)> tick = [&](const boost::system::error_code& error)
     {
-        if (error != boost::asio::error::operation_aborted)
+        try
         {
-            if (flag)
+            if (error != boost::asio::error::operation_aborted)
             {
-                agent.alert("testing, attention please!");
+                if (flag)
+                {
+                    agent.alert("testing, attention please!");
+                }
+                else
+                {
+                    agent.info("blah blah blah");
+                }
+
+                flag = !flag;
+
+                timer.expires_from_now(std::chrono::milliseconds(5000));
+                timer.async_wait(tick);
             }
             else
             {
-                agent.info("blah blah blah");
+                std::cerr << "timer operation aborted!" << std::endl;
             }
-
-            flag = !flag;
-
-            timer.expires_from_now(std::chrono::milliseconds(5000));
-            timer.async_wait(tick);
+        }
+        catch (...)
+        {
+            std::cerr << "bad!" << std::endl;
         }
     };
 
@@ -104,6 +115,7 @@ int main(int argc, char* argv[])
         {
             std::cout << std::this_thread::get_id() << ": connected! " << std::endl;
             agent.send("log", "hello!");
+            //badge(io, agent);
         };
 
         agent.ondisconnect = [&io](const std::runtime_error& error)
@@ -222,8 +234,7 @@ int main(int argc, char* argv[])
         agent.connect();
 
         // chage the alert|info badge periodically
-        badge(io, agent);
-
+        //badge(io, agent);
 
         // run our own event pump
         io.run();

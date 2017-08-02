@@ -264,6 +264,7 @@ div.section-header {
 }
 
 #panicbar > .item:first-child {
+    padding-right: 0px;
 }
 
 #panicbar > .item:nth-child(3) {

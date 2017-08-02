@@ -473,7 +473,7 @@ class Application
         var show = false;
 
         if (message.id) {
-            depth.textContent = message.depth;
+            depth.textContent = '#' + message.depth;
             timestamp.textContent = (new Date(message.when)).strtime();
             source.textContent = message.source.name + '.' + message.source.instance;
             text.textContent = message.text;

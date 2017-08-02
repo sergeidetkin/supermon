@@ -473,7 +473,7 @@ var application = new class Application
 
         if (cmdline.options['dump-schema']) {
             log.put(JSON.stringify(schema, null, '  '));
-            return process.exit(1);
+            return process.exit(0);
         }
 
         this.httpServer = HTTP.createServer((request, response) => {
