@@ -36,7 +36,8 @@ body {
 #left {
     flex: 0 0 30ch;
     /*background-color: rgb(225,229,234);*/
-    border-right: 1px solid rgb(160,160,160);
+    /*border-right: 1px solid rgb(160,160,160);*/
+    border-right: 1px solid slategray;
     /*border-right: 1px solid #0C0;*/
 }
 
@@ -60,7 +61,8 @@ div.section-header {
 #input {
     flex: 0 0 auto;
     min-height: 16px;
-    border-bottom: 1px solid rgb(160,160,160);
+    /*border-bottom: 1px solid rgb(160,160,160);*/
+    border-bottom: 1px solid slategray;
 }
 
 #input table {
@@ -134,7 +136,8 @@ div.section-header {
 .toolbar {
     flex: 0 0 auto !important;
     /*background-color: rgb(230,230,230);*/
-    border-bottom: 1px solid rgb(160,160,160);
+    /*border-bottom: 1px solid rgb(160,160,160);*/
+    border-bottom: 1px solid slategray;
     cursor: default;
     min-height: 1.5em;
 }
@@ -144,7 +147,8 @@ div.section-header {
     line-height: 1.5em;
     padding-left: 8px;
     padding-right: 8px;
-    border-right: 1px solid rgb(160,160,160);
+    /*border-right: 1px solid rgb(160,160,160);*/
+    border-right: 1px solid slategray;
 }
 
 .list-view {
@@ -224,7 +228,8 @@ div.section-header {
 }
 
 .list-view#proc-view > .item {
-    border-bottom: 1px solid rgb(160,160,160);
+    /*border-bottom: 1px solid rgb(160,160,160);*/
+    border-bottom: 1px solid slategray;
 }
 
 #statusbar {
@@ -244,7 +249,8 @@ div.section-header {
     line-height: 1.5em;
     padding-left: 8px;
     padding-right: 8px;
-    border-right: 1px solid rgb(160,160,160);
+    /*border-right: 1px solid rgb(160,160,160);*/
+    border-right: 1px solid slategray;
 }
 
 #panicbar {
@@ -307,7 +313,7 @@ div.section-header {
 }
 
 .active {
-    box-shadow: inset 0px 3px #0C0;
+    box-shadow: inset 0px -3px #0C0;
 }
 
 .online > .label > .led {
@@ -355,7 +361,7 @@ div.section-header {
     padding-right: 8px;
     font-size: smaller;
     border-right: 1px solid rgb(160,160,160);
-    border-bottom: 1px solid rgb(160,160,160);
+    /*border-bottom: 1px solid rgb(160,160,160);*/
     cursor: cell;
     white-space: nowrap;
     overflow: hidden;
@@ -363,9 +369,13 @@ div.section-header {
 }
 
 .dataset > thead > tr > td {
-    /*color: rgb(20, 20, 20);*/
-    font-weight: bold;
+    color: rgb(20, 20, 20);
+    /*font-weight: bold;*/
     background-color: #EEE;
+}
+
+.dataset > tbody > tr:last-child > td {
+    border-bottom: 1px solid rgb(160,160,160);
 }
 
 .dataset > tbody > tr > td:first-child {
@@ -373,11 +383,16 @@ div.section-header {
     /*background-color: #EEE;*/
 }
 
+.dataset > thead > tr > td {
+    /*background-color: #EEE;*/
+    border-bottom: 1px solid rgb(160,160,160);
+}
+
 .dataset > tbody > tr:nth-child(even) {
     background-color: #F5F5F5;
 }
 
 .dataset > tbody > tr:hover {
-    /*background-color: #EFE;*/
+    background-color: rgb(216,220,220);
 }
 
