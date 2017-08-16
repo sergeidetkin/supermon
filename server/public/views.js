@@ -177,6 +177,27 @@ class ListViewItem extends View
     constructor(element) {
         super(element);
     }
+
+    set text(str) {
+        this.element.textContent = str;
+    }
+
+    get text() {
+        return this.element.textContent;
+    }
+
+    set selected(flag) {
+        if (flag && !this.active) {
+            this.element.classList.add('selected');
+        }
+        else if (!flag && this.active) {
+            this.element.classList.remove('selected');
+        }
+    }
+
+    get selected() {
+        return this.element.classList.contains('selected');
+    }
 }
 
 class EventListViewItem extends ListViewItem
@@ -190,14 +211,6 @@ class EventListViewItem extends ListViewItem
             element.classList.add('item');
             super(element);
         }
-    }
-
-    set text(str) {
-        this.element.textContent = str;
-    }
-
-    get text() {
-        return this.element.textContent;
     }
 }
 
@@ -223,7 +236,7 @@ class CommandListViewItem extends ListViewItem
     }
 }
 
-class ChannelsListViewItem extends ListViewItem
+class ChannelListViewItem extends ListViewItem
 {
     constructor() {
         if (0 < arguments.length) {
@@ -234,6 +247,19 @@ class ChannelsListViewItem extends ListViewItem
             element.classList.add('item');
             super(element);
         }
+    }
+
+    set active(flag) {
+        if (flag && !this.active && !this.selected) {
+            this.element.classList.add('active');
+        }
+        else if (!flag && this.active) {
+            this.element.classList.remove('active');
+        }
+    }
+
+    get active() {
+        return this.element.classList.contains('active');
     }
 
     bind(key, client) {
@@ -272,6 +298,13 @@ class ProcessListViewItem extends ListViewItem
 
             super(element);
         }
+    }
+
+    set text(str) {
+    }
+
+    get text() {
+        return '';
     }
 
     set online(flag) {
@@ -377,6 +410,18 @@ class ListView extends View
         window.setTimeout(function() {
             window.dispatchEvent(new Event('split'));
         });
+    }
+
+    find(predicate) {
+        if ('function' != typeof(predicate)) {
+            throw new Error('invalid argument');
+        }
+        var children = Array.from(this.element.children);
+        for (var n = 0; n < children.length; ++n) {
+            var child = children[n];
+            if (predicate(child)) return child;
+        }
+        return null;
     }
 
     onItemClick(e) {

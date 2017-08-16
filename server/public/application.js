@@ -74,12 +74,26 @@ class Application
         this.websocket.send(JSON.stringify(message));
     }
 
+    updateChannelActivityIndicator(channelName, isActive) {
+        var element = this.channelsListView.find(function(child) {
+            if (child.target.channel == channelName) return true;
+            return false;
+        });
+        if (element) {
+            var item = new ChannelListViewItem(element);
+            item.active = isActive;
+        }
+    }
+
     onSelectedChannelChanged(e) {
         this.websocket.send(JSON.stringify({ unsubscribe: {} }));
         this.channelView.clear();
 
         if (-1 != e.selectedIndex) {
-            var topic = this.channelsListView.element.children[e.selectedIndex].target;
+            var element = this.channelsListView.element.children[e.selectedIndex];
+            var item = new ChannelListViewItem(element);
+            item.active = false;
+            var topic = element.target;
             var message = {
                 subscribe: topic
             };
@@ -96,7 +110,7 @@ class Application
         if (client.hasOwnProperty('channels')) {
             for (var key in client.channels) {
                 //var command = client.commands[key];
-                var it = new ChannelsListViewItem();
+                var it = new ChannelListViewItem();
                 it.bind(key, client);
                 this.channelsListView.add(it);
             }
@@ -462,6 +476,10 @@ class Application
         client.status = { type: message.type, text: message.text, when: message.when };
         this.updateClientStatus(client);
         this.updateStatusBar();
+    }
+
+    onchannelnotempty(message) {
+        this.updateChannelActivityIndicator(message.channel, true);
     }
 
     onpanic(message) {

@@ -147,6 +147,7 @@ class EventSource extends EventEmitter
     }
 }
 
+const hints = new EventSource({ name: 'hints', history: 1 });
 const user = new EventSource({ name: 'user' });
 const api = new EventSource({ name: 'api' });
 
@@ -305,6 +306,14 @@ class ApiMessageHandler extends MessageHandler
                 },
                 when: message.when
             });
+
+            const hint = {
+                channel: message.channel,
+                port: message.port,
+                when: message.when
+            };
+
+            hints.notify('channelnotempty', hint);
         }
         else {
             log.warning('failed to dispatch push notification from', this.clientId, ':', JSON.stringify(message));
@@ -390,6 +399,8 @@ class UserMessageHandler extends MessageHandler
 
         const message = { 'snapshot' : clients };
         this.send(message);
+
+        hints.subscribe('channelnotempty', this, this.onchannelnotempty);
     }
 
     get connection() {
@@ -442,6 +453,12 @@ class UserMessageHandler extends MessageHandler
         this.send(message);
     }
 
+    onchannelnotempty(event) {
+        if (0 < event.port && event.port != this.id) return;
+        const message = { channelnotempty: event };
+        this.send(message);
+    }
+
     onlogin(event) {
         const message = { login: event };
         this.send(message);
@@ -459,6 +476,7 @@ class UserMessageHandler extends MessageHandler
 
     finalize() {
         this.onunsubscribe(true);
+        hints.unsubscribe('channelnotempty', this.onchannelnotempty);
         user.unsubscribe('login', this.onlogin);
         user.unsubscribe('status', this.onstatus);
         user.unsubscribe('panic', this.onstatus);

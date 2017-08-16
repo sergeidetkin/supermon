@@ -93,7 +93,6 @@ div.section-header {
     min-width: 2ch;
     border: none;
     border-radius: 3px;
-    background-color: white;
     padding: 2px 10px;
     outline: none;
     font-size: 95%;
@@ -160,6 +159,7 @@ div.section-header {
 }
 
 .item:hover {
+    color: inherit;
     background-color: #EEE;
 }
 
@@ -304,6 +304,10 @@ div.section-header {
 #channel-view > .item {
     font-size: small;
     font-family: 'Consolas', 'Menlo', monospace;
+}
+
+.active {
+    box-shadow: inset 0px 3px #0C0;
 }
 
 .online > .label > .led {
