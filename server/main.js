@@ -310,6 +310,10 @@ class ApiMessageHandler extends MessageHandler
             const hint = {
                 channel: message.channel,
                 port: message.port,
+                source: {
+                    name: client.name,
+                    instance: client.instance
+                },
                 when: message.when
             };
 

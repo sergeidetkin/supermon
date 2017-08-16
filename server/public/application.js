@@ -479,7 +479,11 @@ class Application
     }
 
     onchannelnotempty(message) {
-        this.updateChannelActivityIndicator(message.channel, true);
+        if (-1 == this.processListView.selectedIndex) return;
+        var selectedClientId = this.processListView.element.children[this.processListView.selectedIndex].id;
+        if (selectedClientId == identify(message.source)) {
+            this.updateChannelActivityIndicator(message.channel, true);
+        }
     }
 
     onpanic(message) {
