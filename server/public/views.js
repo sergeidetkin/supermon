@@ -156,7 +156,8 @@ class TableView extends View
 
     set data(src) {
         var table = this.element.createTBody();
-        for (var r = 1000 < src.length ? src.length - 1000 : 0; r < src.length; ++r) {
+        //for (var r = 1000 < src.length ? src.length - 1000 : 0; r < src.length; ++r) {
+        for (var r = 0; r < src.length; ++r) {
             var row = table.insertRow();
             var cell = row.insertCell();
             cell.textContent = r + 1;
