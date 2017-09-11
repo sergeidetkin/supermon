@@ -41,7 +41,7 @@ function strtime(t) {
 };
 
 const cmdline = getopt.create([
-    ['l', 'log=ARG',     'set logging verbosity level ARG=[trace|debug|info|warning|error]'],
+    ['l', 'log=ARG',     'set log verbosity. ARG=[trace|debug|info|warning|error]'],
     ['',  'dump-schema', 'dump the schema to stdout and exit'],
     ['h', 'help',        'print this message']
 ]).bindHelp().parseSystem();
