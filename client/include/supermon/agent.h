@@ -23,6 +23,7 @@
 #include <future>
 #include <chrono>
 #include <map>
+#include <mutex>
 
 #include "boost/asio.hpp"
 #include "boost/asio/system_timer.hpp"
@@ -106,6 +107,7 @@ namespace supermon
         beast::websocket::stream<boost::asio::ip::tcp::socket&> _websocket;
         std::chrono::time_point<std::chrono::system_clock>      _when = std::chrono::system_clock::now();
         std::map<std::string, callback::handler>                _handlers;
+        std::mutex                                              _write_lock;
     };
 
 }

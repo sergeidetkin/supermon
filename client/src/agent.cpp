@@ -202,7 +202,10 @@ namespace supermon
             boost::asio::streambuf buffer;
             std::ostream os(&buffer);
             boost::property_tree::write_json(os, message, false);
-            _websocket.write(buffer.data());
+            {
+                std::lock_guard<std::mutex> _(_write_lock);
+                _websocket.write(buffer.data());
+            }
         }
         catch (const std::exception& e)
         {
@@ -237,7 +240,10 @@ namespace supermon
 
             os << "\"data\":" << data << "}}}";
 
-            _websocket.write(buffer.data());
+            {
+                std::lock_guard<std::mutex> _(_write_lock);
+                _websocket.write(buffer.data());
+            }
         }
         catch (const std::exception& e)
         {
